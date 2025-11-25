@@ -2,12 +2,10 @@
 // src/pages/store.astro
 import Layout from '../layouts/Layout.astro';
 import StoreLayout from '../components/StoreLayout';
+import Footer from '../components/Footer.astro';
 import { products } from '../data/products';
 
-// 画像を動的にインポート (存在する場合のみ)
 const productImages = import.meta.glob<{ default: ImageMetadata }>('../assets/img/*.png');
-
-// 画像が存在する場合は最適化、存在しない場合はプレースホルダー
 const imagesMap = new Map();
 
 for (const product of products) {
@@ -15,7 +13,6 @@ for (const product of products) {
   
   try {
     if (productImages[imagePath]) {
-      // 画像が存在する場合
       const image = await productImages[imagePath]();
       const { getImage } = await import('astro:assets');
       const optimizedImage = await getImage({ 
@@ -25,21 +22,23 @@ for (const product of products) {
       });
       imagesMap.set(product.id, optimizedImage.src);
     } else {
-      // 画像が存在しない場合はプレースホルダー
       const placeholderUrl = `https://placehold.co/800x800/6366f1/ffffff?text=${encodeURIComponent(product.id)}`;
       imagesMap.set(product.id, placeholderUrl);
     }
   } catch (error) {
-    // エラーが発生した場合もプレースホルダー
     const placeholderUrl = `https://placehold.co/800x800/6366f1/ffffff?text=${encodeURIComponent(product.id)}`;
     imagesMap.set(product.id, placeholderUrl);
   }
 }
 
-// 画像パスをマップとして渡す
 const imageMap = Object.fromEntries(imagesMap);
 ---
 
-<Layout title="Store - Music Store">
+<Layout title="Store - Music Store" isStorePage={true}>
   <StoreLayout client:load products={products} imageMap={imageMap} />
+  
+  <!-- Footerをサイドバーの右側に配置 -->
+  <div class="lg:ml-56">
+    <Footer />
+  </div>
 </Layout>

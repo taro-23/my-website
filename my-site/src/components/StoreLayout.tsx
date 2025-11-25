@@ -52,12 +52,10 @@ export default function StoreLayout({ products, imageMap }: Props) {
 
   return (
     <div className="min-h-screen pt-16">
-      {/* モバイル用ボタンはソートバー内にあるためここでは不要 */}
- 
       {/* 逆L字型レイアウト */}
       <div className="flex">
         {/* 左側: フィルター（固定） */}
-        <aside className="hidden lg:block fixed left-0 top-16 w-56 h-[calc(100vh-4rem)] bg-white border-r border-gray-850 overflow-y-auto">
+        <aside className="hidden lg:block fixed left-0 top-16 w-56 h-[calc(100vh-4rem)] bg-white border-r border-gray-850 overflow-y-auto z-30">
           <div className="p-4">
             <ProductFilter 
               filters={filters} 
@@ -68,9 +66,9 @@ export default function StoreLayout({ products, imageMap }: Props) {
         </aside>
 
         {/* 右側: メインコンテンツエリア */}
-        <div className="w-950 lg:ml-58">
+        <div className="w-full lg:ml-56">
           {/* ソートバー（固定） */}
-          <div className="sticky top-1 bg-white border-b border-gray-950 z-40">
+          <div className="sticky top-16 bg-white border-b border-gray-950 z-20">
             <div className="px-4 py-1">
               <div className="flex items-center justify-between flex-wrap gap-1">
                 <div className="flex items-center gap-1 flex-wrap">
@@ -143,7 +141,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
               {/* 背景遮蔽（クリックで閉じる） */}
               <div className="absolute inset-0 bg-black/50" onClick={() => setShowFilters(false)} />
 
-              {/* フィルター本体：幅は画面幅いっぱい（w-full） */}
+              {/* フィルター本体 */}
               <aside id="mobile-filters" className="absolute left-0 top-0 h-full w-full bg-white overflow-auto p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold">Filters</h2>
@@ -156,10 +154,8 @@ export default function StoreLayout({ products, imageMap }: Props) {
                   </button>
                 </div>
 
-                {/* 既存のフィルターコンポーネントをそのまま埋め込む */}
                 <ProductFilter filters={filters} setFilters={setFilters} allProducts={products} />
 
-                {/* フッターのアクション（任意：適用／クリア） */}
                 <div className="mt-6 flex gap-2">
                   <button
                     onClick={() => { setFilters({ paid: null, type: null, platform: [], bundle: null }); setShowFilters(false); }}
@@ -179,7 +175,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
           )}
 
           {/* 商品グリッド（スクロール可能） */}
-          <div className="p-6">
+          <div className="p-6 pb-0">
             {filteredAndSortedProducts.length === 0 ? (
               <div className="text-center py-16">
                 <svg className="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

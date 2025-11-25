@@ -1,17 +1,17 @@
+
 ---
 // src/layouts/Layout.astro
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-// グローバルCSSをインポート
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description?: string;
-  hasSidebar?: boolean;
+  isStorePage?: boolean;
 }
 
-const { title, description = 'Music Production Store', hasSidebar = false } = Astro.props;
+const { title, description = 'Music Production Store', isStorePage = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -25,9 +25,9 @@ const { title, description = 'Music Production Store', hasSidebar = false } = As
   </head>
   <body class="min-h-screen flex flex-col bg-white">
     <Header />
-    <main class={`grow pt-16 ${hasSidebar ? 'lg:pl-56' : ''}`}>
+    <main class={`grow ${isStorePage ? '' : 'pt-16'}`}>
       <slot />
     </main>
-    <Footer hasSidebar={hasSidebar} />
+    {!isStorePage && <Footer />}
   </body>
 </html>
