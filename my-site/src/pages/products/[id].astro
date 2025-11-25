@@ -1,0 +1,228 @@
+---
+// src/pages/products/[id].astro
+import Layout from '../../layouts/Layout.astro';
+import { products, type Product } from '../../data/products';
+import { Image } from 'astro:assets';
+
+export async function getStaticPaths() {
+  // 各商品の画像を動的にインポート
+  const productImages = import.meta.glob<{ default: ImageMetadata }>('../../assets/img/*.png');
+  
+  const paths = await Promise.all(
+    products.map(async (product) => {
+      const imagePath = `../../assets/img/${product.image}`;
+      let imageModule = null;
+      
+      if (productImages[imagePath]) {
+        imageModule = await productImages[imagePath]();
+      }
+      
+      return {
+        params: { id: product.id },
+        props: { 
+          product,
+          imageModule: imageModule?.default || null
+        },
+      };
+    })
+  );
+  
+  return paths;
+}
+
+const { product, imageModule } = Astro.props;
+
+// GumroadのURLからembed用のIDを抽出
+const getGumroadEmbedUrl = (url: string) => {
+  const match = url.match(/gumroad\.com\/l\/([^/?]+)/);
+  const productId = match ? match[1] : '';
+  return `https://kimurataro.gumroad.com/l/${productId}`;
+};
+
+// 関連商品の画像も取得
+const relatedProducts = products.filter(p => p.id !== product.id && p.type === product.type).slice(0, 4);
+const relatedProductImages = import.meta.glob<{ default: ImageMetadata }>('../../assets/img/*.png');
+const relatedImagesMap = new Map();
+
+for (const rp of relatedProducts) {
+  const imagePath = `../../assets/img/${rp.image}`;
+  if (relatedProductImages[imagePath]) {
+    const img = await relatedProductImages[imagePath]();
+    relatedImagesMap.set(rp.id, img.default);
+  }
+}
+---
+
+<Layout title={`${product.name} - Music Store`}>
+  <div class="container mx-auto px-4 py-8">
+    <!-- パンくずリスト -->
+    <nav class="text-sm text-gray-600 mb-6">
+      <a href="/" class="hover:text-gray-900">Home</a>
+      <span class="mx-2">/</span>
+      <a href="/store" class="hover:text-gray-900">Store</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-900">{product.name}</span>
+    </nav>
+
+    <div class="grid lg:grid-cols-2 gap-12">
+      <!-- 左側: 商品画像 -->
+      <div>
+        <div class="sticky top-24">
+          <div class="bg-gray-100 rounded-lg overflow-hidden aspect-square">
+            {imageModule ? (
+              <Image
+                src={imageModule}
+                alt={product.name}
+                width={800}
+                height={800}
+                format="webp"
+                class="w-full h-full object-cover"
+              />
+            ) : (
+              <div class="w-full h-full flex items-center justify-center text-gray-400">
+                No Image
+              </div>
+            )}
+          </div>
+          
+          {/* 商品情報 */}
+          <div class="mt-6 space-y-4">
+            <div>
+              <h3 class="text-sm font-semibold text-gray-700 mb-2">Product Type</h3>
+              <span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                {product.type}
+              </span>
+            </div>
+            
+            <div>
+              <h3 class="text-sm font-semibold text-gray-700 mb-2">Platform</h3>
+              <div class="flex flex-wrap gap-2">
+                {product.platform.map((plat) => (
+                  <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
+                    {plat}
+                  </span>
+                ))}
+              </div>
+            </div>
+            
+            {product.bundle && (
+              <div>
+                <span class="inline-flex items-center gap-2 bg-purple-50 text-purple-700 px-3 py-2 rounded-lg text-sm font-semibold">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                  </svg>
+                  Bundle Deal
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <!-- 右側: Gumroad埋め込み -->
+      <div>
+        <h1 class="text-3xl md:text-4xl font-bold mb-4">{product.name}</h1>
+        
+        <div class="flex items-center gap-4 mb-8">
+          <span class="text-4xl font-bold text-gray-900">
+            {product.paid ? `$${product.price}` : 'FREE'}
+          </span>
+          {!product.paid && (
+            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+              Free Download
+            </span>
+          )}
+        </div>
+
+        <!-- Gumroad Embed -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+          <div class="gumroad-product-embed" data-gumroad-product-id={product.id}>
+            <a href={product.gumroadUrl} target="_blank" rel="noopener noreferrer" 
+               class="block bg-black text-white text-center py-4 px-6 rounded-lg hover:bg-gray-800 transition text-lg font-semibold">
+              View on Gumroad →
+            </a>
+          </div>
+        </div>
+
+        <!-- 追加情報 -->
+        <div class="bg-gray-50 rounded-lg p-6">
+          <h3 class="text-xl font-bold mb-4">Product Details</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Product ID:</span>
+              <span class="font-semibold">{product.id}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Release Date:</span>
+              <span class="font-semibold">{new Date(product.date).toLocaleDateString()}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Type:</span>
+              <span class="font-semibold">{product.type}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 戻るボタン -->
+        <div class="mt-8">
+          <a 
+            href="/store" 
+            class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Store
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 関連商品セクション -->
+    {relatedProducts.length > 0 && (
+      <div class="mt-16">
+        <h2 class="text-2xl font-bold mb-6">More Products</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {relatedProducts.map((rp) => (
+            <a 
+              href={`/products/${rp.id}`}
+              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+            >
+              <div class="aspect-square bg-gray-200">
+                {relatedImagesMap.has(rp.id) ? (
+                  <Image
+                    src={relatedImagesMap.get(rp.id)}
+                    alt={rp.name}
+                    width={400}
+                    height={400}
+                    format="webp"
+                    class="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center text-gray-400">
+                    No Image
+                  </div>
+                )}
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-sm mb-2 line-clamp-2">{rp.name}</h3>
+                <span class="text-lg font-bold">
+                  {rp.paid ? `$${rp.price}` : 'FREE'}
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</Layout>
+
+<!-- Gumroad Script -->
+<script is:inline src="https://gumroad.com/js/gumroad-embed.js"></script>
+
+<style>
+  .gumroad-product-embed {
+    min-height: 400px;
+  }
+</style>

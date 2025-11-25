@@ -1,0 +1,40 @@
+---
+// ========================================
+// src/pages/blog.astro
+// ========================================
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Blog/News - Music Store">
+  <div class="container mx-auto px-4 py-16">
+    <h1 class="text-4xl font-bold mb-8">Blog / News</h1>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <article class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="aspect-video bg-gray-200"></div>
+        <div class="p-6">
+          <h2 class="text-xl font-bold mb-2">New Product Release</h2>
+          <p class="text-gray-600 mb-4">Our latest EDM bundle has been released...</p>
+          <a href="#" class="text-purple-600 hover:underline">Read more →</a>
+        </div>
+      </article>
+      
+      <article class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="aspect-video bg-gray-200"></div>
+        <div class="p-6">
+          <h2 class="text-xl font-bold mb-2">Production Tips</h2>
+          <p class="text-gray-600 mb-4">Learn how to use our wavetables effectively...</p>
+          <a href="#" class="text-purple-600 hover:underline">Read more →</a>
+        </div>
+      </article>
+      
+      <article class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="aspect-video bg-gray-200"></div>
+        <div class="p-6">
+          <h2 class="text-xl font-bold mb-2">Artist Spotlight</h2>
+          <p class="text-gray-600 mb-4">Featuring artists using our sample packs...</p>
+          <a href="#" class="text-purple-600 hover:underline">Read more →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</Layout>

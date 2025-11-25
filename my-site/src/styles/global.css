@@ -1,0 +1,158 @@
+/* Tailwind v4 */
+@import "tailwindcss";
+
+/* -----------------------------------
+Base enhancements (崩れ防止・可読性向上)
+----------------------------------- */
+
+/* ボックスサイズの統一（レイアウトの破綻を防ぐ） */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ベースの余白はリセットしない（Tailwindのmarginを潰さないため） */
+html {
+  scroll-behavior: smooth;
+}
+
+/* デフォルトフォント & 滑らかなレンダリング */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: white;
+  color: #111;
+}
+
+/* 画像・動画が親の幅を超えないようにする（UI崩れ防止） */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ボタン・入力のデフォルト装飾を整える */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Flex間スペース・gap対応用の余計なmargin除去（UI安定化） */
+ul,
+ol {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+/* チェックボックスのカスタムスタイル（白黒、黒チェック） */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: white;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0.25rem;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #111827;
+  border-color: #111827;
+}
+
+input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40%;
+  height: 70%;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -60%) rotate(45deg);
+}
+
+input[type="checkbox"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.2);
+}
+
+input[type="checkbox"]:hover {
+  border-color: #9ca3af;
+}
+
+/* -----------------------------------
+   Components
+----------------------------------- */
+
+.btn-primary {
+  @apply bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold border-2 border-gray-900 hover:bg-gray-50 transition-colors;
+}
+
+.card {
+  @apply bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300;
+}
+
+.input-field {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none;
+}
+
+/* -----------------------------------
+Utilities
+----------------------------------- */
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* -----------------------------------
+Visual details
+----------------------------------- */
+/* スクロールバー */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #e5e5e5;
+}
+::-webkit-scrollbar-thumb {
+  background: #777;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 選択ハイライト */
+::selection {
+  background-color: #6366f1;
+  color: white;
+}
+::-moz-selection {
+  background-color: #6366f1;
+  color: white;
+}

@@ -1,0 +1,73 @@
+---
+// ========================================
+// src/pages/contact.astro
+// ========================================
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Contact - Music Store">
+  <div class="container mx-auto px-4 py-16">
+    <h1 class="text-4xl font-bold mb-8">Contact</h1>
+    <div class="max-w-2xl">
+      <!-- Formspree を使ったフォーム -->
+      <form id="contact-form" class="space-y-6" method="POST" action="https://formspree.io/f/mqaoedyj">
+        <div>
+          <label class="block text-sm font-medium mb-2">Name</label>
+          <input name="name" type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600" required />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Email</label>
+          <input name="_replyto" type="email" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600" required />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Message</label>
+          <textarea name="message" rows="6" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-600" required></textarea>
+        </div>
+
+        <!-- オプション: スパム防止やレスポンス制御用の hidden フィールド -->
+        <input type="hidden" name="_subject" value="New contact from site" />
+        <input type="hidden" name="_captcha" value="false" />
+
+        <button type="submit" class="bg-slate-950 text-white px-8 py-3 rounded-lg hover:bg-slate-400">
+          Send
+        </button>
+
+        <p id="form-status" class="text-sm mt-2 text-gray-600" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+</Layout>
+
+<script type="module">
+/*
+  オプション: JS で非同期送信して画面遷移なしに成功/失敗メッセージを表示する例。
+  action 属性をそのまま使うため、FORM_ID を置換してください。
+*/
+const form = document.getElementById('contact-form');
+const status = document.getElementById('form-status');
+
+if (form) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    status.textContent = 'Sending...';
+    const url = form.action;
+    const data = new FormData(form);
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        status.textContent = 'Message sent — thank you!';
+        form.reset();
+      } else {
+        const json = await res.json().catch(()=>null);
+        status.textContent = (json && json.error) ? json.error : 'Failed to send message.';
+      }
+    } catch (err) {
+      status.textContent = 'Network error. Please try again later.';
+    }
+  });
+}
+</script>
