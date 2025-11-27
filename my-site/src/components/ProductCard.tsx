@@ -1,5 +1,5 @@
 // src/components/ProductCard.tsx
-import type { Product } from '../data/products';
+import type { Product } from '../data/productsdata';
 
 interface Props {
   product: Product;

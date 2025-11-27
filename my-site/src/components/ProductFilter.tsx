@@ -1,6 +1,6 @@
 // src/components/ProductFilter.tsx
 import { useMemo, useState } from 'react';
-import type { Product } from '../data/products';
+import type { Product } from '../data/productsdata';
 
 interface FilterState {
   paid: boolean | null;

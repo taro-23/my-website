@@ -1,6 +1,6 @@
 // src/components/StoreLayout.tsx
 import { useState, useMemo } from 'react';
-import type { Product } from '../data/products';
+import type { Product } from '../data/productsdata';
 import ProductFilter from './ProductFilter';
 import ProductCard from './ProductCard';
 

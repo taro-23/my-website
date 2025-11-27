@@ -3,7 +3,16 @@
 import Layout from '../layouts/Layout.astro';
 import StoreLayout from '../components/StoreLayout';
 import Footer from '../components/Footer.astro';
-import { products } from '../data/products';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+// Content Collectionから商品データを取得
+const productEntries = await getCollection('products');
+
+// products.tsと同じ形式に変換
+const products = productEntries.map((entry: CollectionEntry<'products'>) => ({
+  id: entry.id,
+  ...entry.data
+}));
 
 const productImages = import.meta.glob<{ default: ImageMetadata }>('../assets/img/*.png');
 const imagesMap = new Map();

@@ -1,16 +1,16 @@
 ---
 // src/pages/products/[id].astro
 import Layout from '../../layouts/Layout.astro';
-import { products, type Product } from '../../data/products';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 
 export async function getStaticPaths() {
-  // 各商品の画像を動的にインポート
+  const products = await getCollection('products');
   const productImages = import.meta.glob<{ default: ImageMetadata }>('../../assets/img/*.png');
   
   const paths = await Promise.all(
-    products.map(async (product) => {
-      const imagePath = `../../assets/img/${product.image}`;
+    products.map(async (product: CollectionEntry<'products'>) => {
+      const imagePath = `../../assets/img/${product.data.image}`;
       let imageModule = null;
       
       if (productImages[imagePath]) {
@@ -30,23 +30,33 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { product, imageModule } = Astro.props;
+type Props = {
+  product: CollectionEntry<'products'>;
+  imageModule: ImageMetadata | null;
+};
 
-// GumroadのURLからproduct IDを抽出  ← ここです
+const { product, imageModule } = Astro.props;
+const { Content } = await product.render();
+
+// GumroadのURLからproduct IDを抽出
 const getGumroadProductId = (url: string) => {
   const match = url.match(/gumroad\.com\/l\/([^/?]+)/);
   return match ? match[1] : '';
 };
 
-const gumroadProductId = getGumroadProductId(product.gumroadUrl);
+const gumroadProductId = getGumroadProductId(product.data.gumroadUrl);
 
-// 関連商品の画像も取得
-const relatedProducts = products.filter(p => p.id !== product.id && p.type === product.type).slice(0, 4);
+// 関連商品を取得
+const allProducts = await getCollection('products');
+const relatedProducts = allProducts
+  .filter((p: CollectionEntry<'products'>) => p.id !== product.id && p.data.type === product.data.type)
+  .slice(0, 4);
+
 const relatedProductImages = import.meta.glob<{ default: ImageMetadata }>('../../assets/img/*.png');
-const relatedImagesMap = new Map();
+const relatedImagesMap = new Map<string, ImageMetadata>();
 
 for (const rp of relatedProducts) {
-  const imagePath = `../../assets/img/${rp.image}`;
+  const imagePath = `../../assets/img/${rp.data.image}`;
   if (relatedProductImages[imagePath]) {
     const img = await relatedProductImages[imagePath]();
     relatedImagesMap.set(rp.id, img.default);
@@ -54,7 +64,7 @@ for (const rp of relatedProducts) {
 }
 ---
 
-<Layout title={`${product.name} - Music Store`}>
+<Layout title={`${product.data.name} - Music Store`}>
   <div class="container mx-auto px-4 py-8">
     <!-- パンくずリスト -->
     <nav class="text-sm text-gray-600 mb-6">
@@ -62,7 +72,7 @@ for (const rp of relatedProducts) {
       <span class="mx-2">/</span>
       <a href="/store" class="hover:text-gray-900">Store</a>
       <span class="mx-2">/</span>
-      <span class="text-gray-900">{product.name}</span>
+      <span class="text-gray-900">{product.data.name}</span>
     </nav>
 
     <div class="grid lg:grid-cols-2 gap-12">
@@ -73,7 +83,7 @@ for (const rp of relatedProducts) {
             {imageModule ? (
               <Image
                 src={imageModule}
-                alt={product.name}
+                alt={product.data.name}
                 width={800}
                 height={800}
                 format="webp"
@@ -86,19 +96,19 @@ for (const rp of relatedProducts) {
             )}
           </div>
           
-          {/* 商品情報 */}
+          <!-- 商品情報 -->
           <div class="mt-6 space-y-4">
             <div>
               <h3 class="text-sm font-semibold text-gray-700 mb-2">Product Type</h3>
               <span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                {product.type}
+                {product.data.type}
               </span>
             </div>
             
             <div>
               <h3 class="text-sm font-semibold text-gray-700 mb-2">Platform</h3>
               <div class="flex flex-wrap gap-2">
-                {product.platform.map((plat) => (
+                {product.data.platform.map((plat: string) => (
                   <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
                     {plat}
                   </span>
@@ -106,7 +116,7 @@ for (const rp of relatedProducts) {
               </div>
             </div>
             
-            {product.bundle && (
+            {product.data.bundle && (
               <div>
                 <span class="inline-flex items-center gap-2 bg-purple-50 text-purple-700 px-3 py-2 rounded-lg text-sm font-semibold">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,31 +130,64 @@ for (const rp of relatedProducts) {
         </div>
       </div>
 
-      <!-- 右側: Gumroad埋め込み -->
+      <!-- 右側: 商品詳細とGumroad埋め込み -->
       <div>
-        <h1 class="text-3xl md:text-4xl font-bold mb-4">{product.name}</h1>
+        <h1 class="text-3xl md:text-4xl font-bold mb-4">{product.data.name}</h1>
         
         <div class="flex items-center gap-4 mb-8">
           <span class="text-4xl font-bold text-gray-900">
-            {product.paid ? `$${product.price}` : 'FREE'}
+            {product.data.paid ? `${product.data.price}` : 'FREE'}
           </span>
-          {!product.paid && (
+          {!product.data.paid && (
             <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
               Free Download
             </span>
           )}
         </div>
 
-
         <!-- Gumroad Embed -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-    <div class="gumroad-product-embed" data-gumroad-product-id={gumroadProductId}>
-    <a href={product.gumroadUrl}>Loading...</a>
-    </div>
-    </div>
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+          <div class="gumroad-product-embed" data-gumroad-product-id={gumroadProductId}>
+            <a href={product.data.gumroadUrl}>Loading...</a>
+          </div>
+        </div>
+
+        <!-- デモ版ダウンロード -->
+        {product.data.demoUrl && (
+          <div class="bg-linear-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6 mb-8">
+            <div class="flex items-start gap-4">
+              <div class="shrink-0">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Try Demo Version</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                  購入前にデモ版をお試しいただけます。製品の一部機能をご体験ください。
+                </p>
+                <a 
+                  href={product.data.demoUrl}
+                  download
+                  class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md hover:shadow-lg"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  Download Demo
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <!-- Markdown コンテンツ -->
+        <div class="prose prose-sm md:prose-base max-w-none mb-8">
+          <Content />
+        </div>
 
         <!-- 追加情報 -->
-        <div class="bg-gray-50 rounded-lg p-6">
+        <div class="bg-gray-50 rounded-lg p-6 mb-8">
           <h3 class="text-xl font-bold mb-4">Product Details</h3>
           <div class="space-y-3 text-sm">
             <div class="flex justify-between">
@@ -153,11 +196,11 @@ for (const rp of relatedProducts) {
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Release Date:</span>
-              <span class="font-semibold">{new Date(product.date).toLocaleDateString()}</span>
+              <span class="font-semibold">{new Date(product.data.date).toLocaleDateString()}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Type:</span>
-              <span class="font-semibold">{product.type}</span>
+              <span class="font-semibold">{product.data.type}</span>
             </div>
           </div>
         </div>
@@ -181,8 +224,8 @@ for (const rp of relatedProducts) {
     {relatedProducts.length > 0 && (
       <div class="mt-16">
         <h2 class="text-2xl font-bold mb-6">More Products</h2>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {relatedProducts.map((rp) => (
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {relatedProducts.map((rp: CollectionEntry<'products'>) => (
             <a 
               href={`/products/${rp.id}`}
               class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
@@ -190,10 +233,10 @@ for (const rp of relatedProducts) {
               <div class="aspect-square bg-gray-200">
                 {relatedImagesMap.has(rp.id) ? (
                   <Image
-                    src={relatedImagesMap.get(rp.id)}
-                    alt={rp.name}
-                    width={300}
-                    height={300}
+                    src={relatedImagesMap.get(rp.id)!}
+                    alt={rp.data.name}
+                    width={400}
+                    height={400}
                     format="webp"
                     class="w-full h-full object-cover"
                   />
@@ -204,9 +247,9 @@ for (const rp of relatedProducts) {
                 )}
               </div>
               <div class="p-4">
-                <h3 class="font-semibold text-sm mb-2 line-clamp-2">{rp.name}</h3>
+                <h3 class="font-semibold text-sm mb-2 line-clamp-2">{rp.data.name}</h3>
                 <span class="text-lg font-bold">
-                  {rp.paid ? `$${rp.price}` : 'FREE'}
+                  {rp.data.paid ? `${rp.data.price}` : 'FREE'}
                 </span>
               </div>
             </a>
@@ -217,15 +260,54 @@ for (const rp of relatedProducts) {
   </div>
 </Layout>
 
-<!-- Gumroad Embed -->
-<div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-  <div class="gumroad-product-embed" data-gumroad-product-id={gumroadProductId}>
-    <a href={product.gumroadUrl}>Loading...</a>
-  </div>
-</div>
+<!-- Gumroad Script -->
+<script is:inline src="https://gumroad.com/js/gumroad-embed.js"></script>
 
 <style>
   .gumroad-product-embed {
     min-height: 400px;
+  }
+
+  /* Markdownコンテンツのスタイル調整 */
+  .prose {
+    color: #374151;
+  }
+  
+  .prose h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #111827;
+  }
+  
+  .prose h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: #1f2937;
+  }
+  
+  .prose ul, .prose ol {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+  
+  .prose li {
+    margin-bottom: 0.25rem;
+  }
+  
+  .prose p {
+    margin-bottom: 1rem;
+    line-height: 1.75;
+  }
+  
+  .prose code {
+    background-color: #f3f4f6;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
   }
 </style>
