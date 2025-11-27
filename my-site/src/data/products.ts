@@ -82,7 +82,7 @@ export const products: Product[] = [
     date: "2025-11-05",
   },
   {
-    id: "dasamplepack",
+    id: "da-samplepack",
     name: "D+A Sample Pack / Rytm Pack",
     price: 10,
     type: "Sample Pack",
@@ -118,7 +118,7 @@ export const products: Product[] = [
     date: "2025-11-08",
   },
   {
-    id: "beapdrumsamplepack",
+    id: "beap-drum-samplepack",
     name: "Beap Drum Sample Pack / Rytm Pack",
     price: 5,
     type: "Sample Pack",
@@ -142,7 +142,7 @@ export const products: Product[] = [
     date: "2025-11-10",
   },
   {
-    id: "op-1samples",
+    id: "op-1-samples",
     name: "DrumKits and Synth Samples for TE OP-1",
     price: 6,
     type: "Sample Pack",
@@ -154,7 +154,7 @@ export const products: Product[] = [
     date: "2025-11-11",
   },
   {
-    id: "sdsamplepacks",
+    id: "sd-samplepack",
     name: "Synth Drum Sample Pack",
     price: 0,
     type: "Sample Pack",
@@ -166,7 +166,7 @@ export const products: Product[] = [
     date: "2025-11-12",
   },
   {
-    id: "amswaveformpack",
+    id: "ams-waveformpack",
     name: "AMS Waveform Pack",
     price: 0,
     type: "Patch Pack",
@@ -178,7 +178,7 @@ export const products: Product[] = [
     date: "2025-11-13",
   },
   {
-    id: "mdefmsamplepack",
+    id: "md-efm-samplepack",
     name: "MD EFM Sample Pack",
     price: 10,
     type: "Sample Pack",
@@ -190,7 +190,7 @@ export const products: Product[] = [
     date: "2025-11-14",
   },
   {
-    id: "mdtrxsamplepack",
+    id: "md-trx-samplepack",
     name: "MD TRX Sample Pack",
     price: 5,
     type: "Sample Pack",
@@ -202,7 +202,7 @@ export const products: Product[] = [
     date: "2025-11-15",
   },
   {
-    id: "mdpisamplepack",
+    id: "md-pi-samplepack",
     name: "MD P-I Sample Pack",
     price: 5,
     type: "Sample Pack",
@@ -238,7 +238,7 @@ export const products: Product[] = [
     date: "2025-11-18",
   },
   {
-    id: "a4modsamplepack",
+    id: "a4-mod-samplepack",
     name: "A4 Mod Drum Sample Pack",
     price: 10,
     type: "Sample Pack",
@@ -274,7 +274,7 @@ export const products: Product[] = [
     date: "2025-11-21",
   },
   {
-    id: "cyclechordpack",
+    id: "cyclechord-pack",
     name: "Cycle Chord Pack for Sampler",
     price: 5,
     type: "Sample Pack",
@@ -310,7 +310,7 @@ export const products: Product[] = [
     date: "2025-11-24",
   },
   {
-    id: "jmbsamplepack",
+    id: "jmb-samplepack",
     name: "JMB Sample Pack",
     price: 12,
     type: "Sample Pack",
@@ -322,7 +322,7 @@ export const products: Product[] = [
     date: "2025-11-25",
   },
   {
-    id: "a-wt-pack",
+    id: "analog-wt",
     name: "Analog Wavetable Pack",
     price: 15,
     type: "Wavetable",
@@ -371,7 +371,7 @@ export const products: Product[] = [
     date: "2025-11-30",
   },
   {
-    id: "doscpack",
+    id: "dosc-pack",
     name: "Digital Oscillator Pack",
     price: 10,
     type: "Sample Pack",
