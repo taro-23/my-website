@@ -91,6 +91,59 @@ input[type="checkbox"]:hover {
   border-color: #9ca3af;
 }
 
+/* ラジオボタンのカスタムスタイル（四角形、バツ印） */
+input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: white;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0.25rem;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 0.75rem;
+  min-height: 0.75rem;
+}
+
+input[type="radio"]:checked {
+  background-color: #111827;
+  border-color: #111827;
+}
+
+/* バツ印の左上から右下の線 */
+input[type="radio"]:checked::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 70%;
+  height: 1.5px;
+  background-color: white;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* バツ印の右上から左下の線 */
+input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 70%;
+  height: 1.5px;
+  background-color: white;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+input[type="radio"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.2);
+}
+
+input[type="radio"]:hover {
+  border-color: #9ca3af;
+}
+
 /* -----------------------------------
    Components
 ----------------------------------- */

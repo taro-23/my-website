@@ -69,13 +69,14 @@ export default function StoreLayout({ products, imageMap }: Props) {
         <div className="w-full lg:ml-56">
           {/* ソートバー（固定） */}
           <div className="sticky top-16 bg-white border-b border-gray-950 z-20">
-            <div className="px-4 py-1">
-              <div className="flex items-center justify-between flex-wrap gap-1">
-                <div className="flex items-center gap-1 flex-wrap">
+            <div className="px-4 py-2">
+              <div className="flex items-center justify-between gap-4">
+                {/* 左側: アクティブフィルター表示 */}
+                <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
                   {/* モバイルフィルターボタン */}
                   <button
                     onClick={() => setShowFilters(!showFilters)}
-                    className="lg:hidden flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition text-sm"
+                    className="lg:hidden flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition text-sm shrink-0"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -93,6 +94,65 @@ export default function StoreLayout({ products, imageMap }: Props) {
                     )}
                   </button>
 
+                  {/* アクティブフィルター表示 */}
+                  {(filters.type || filters.platform.length > 0 || filters.bundle !== null || filters.paid !== null) && (
+                    <div className="hidden lg:flex items-center gap-2 flex-wrap">
+                      <span className="text-xs text-gray-600 font-medium shrink-0">Active:</span>
+                      {filters.type && (
+                        <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                          {filters.type}
+                          <button
+                            onClick={() => setFilters({ ...filters, type: null, platform: [] })}
+                            className="hover:text-blue-900"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      )}
+                      {filters.platform.slice(0, 2).map((plat) => (
+                        <span key={plat} className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                          {plat}
+                          <button
+                            onClick={() => setFilters({ ...filters, platform: filters.platform.filter(p => p !== plat) })}
+                            className="hover:text-green-900"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                      {filters.platform.length > 2 && (
+                        <span className="text-xs text-gray-600">
+                          +{filters.platform.length - 2} more
+                        </span>
+                      )}
+                      {filters.bundle !== null && (
+                        <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
+                          {filters.bundle ? 'Bundle' : 'Single'}
+                          <button
+                            onClick={() => setFilters({ ...filters, bundle: null })}
+                            className="hover:text-purple-900"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      )}
+                      {filters.paid !== null && (
+                        <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
+                          {filters.paid ? 'Paid' : 'Free'}
+                          <button
+                            onClick={() => setFilters({ ...filters, paid: null })}
+                            className="hover:text-yellow-900"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* 右側: ソートと商品数 */}
+                <div className="flex items-center gap-3 shrink-0">
                   {/* ソートメニュー */}
                   <div className="flex items-center gap-2">
                     <button
@@ -126,10 +186,10 @@ export default function StoreLayout({ products, imageMap }: Props) {
                       High
                     </button>
                   </div>
-                </div>
 
-                <div className="text-gray-600 text-xs font-medium">
-                  {filteredAndSortedProducts.length} products
+                  <div className="text-gray-600 text-xs font-medium whitespace-nowrap">
+                    {filteredAndSortedProducts.length} products
+                  </div>
                 </div>
               </div>
             </div>
@@ -175,7 +235,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
           )}
 
           {/* 商品グリッド（スクロール可能） */}
-          <div className="p-6 pb-0">
+          <div className="p-10 pb-0">
             {filteredAndSortedProducts.length === 0 ? (
               <div className="text-center py-16">
                 <svg className="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,7 +251,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredAndSortedProducts.map((product) => (
                   <ProductCard 
                     key={product.id} 

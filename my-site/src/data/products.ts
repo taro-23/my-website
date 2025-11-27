@@ -22,7 +22,7 @@ const getProductImageUrl = (filename: string, productId: string) => {
 export const products: Product[] = [
    // Sample Packs
   {
-    id: "de-mod-drumsamplepack",
+    id: "demod-drum-samplepack",
     name: "Dark Energy MOD Sample Pack/Rytm Pack",
     price: 10,
     type: "Sample Pack",
@@ -34,7 +34,7 @@ export const products: Product[] = [
     date: "2025-11-01",
   },
   {
-    id: "dedrumsamplepack",
+    id: "de-drum-samplepack",
     name: "Dark Energy Sample Pack/Rytm Pack",
     price: 12,
     type: "Sample Pack",
