@@ -38,14 +38,6 @@ type Props = {
 const { product, imageModule } = Astro.props;
 const { Content } = await product.render();
 
-// GumroadのURLからproduct IDを抽出
-const getGumroadProductId = (url: string) => {
-  const match = url.match(/gumroad\.com\/l\/([^/?]+)/);
-  return match ? match[1] : '';
-};
-
-const gumroadProductId = getGumroadProductId(product.data.gumroadUrl);
-
 // 関連商品を取得
 const allProducts = await getCollection('products');
 const relatedProducts = allProducts
@@ -65,249 +57,255 @@ for (const rp of relatedProducts) {
 ---
 
 <Layout title={`${product.data.name} - Music Store`}>
-  <div class="container mx-auto px-4 py-8">
+  <div class="bg-white min-h-screen">
     <!-- パンくずリスト -->
-    <nav class="text-sm text-gray-600 mb-6">
-      <a href="/" class="hover:text-gray-900">Home</a>
-      <span class="mx-2">/</span>
-      <a href="/store" class="hover:text-gray-900">Store</a>
-      <span class="mx-2">/</span>
-      <span class="text-gray-900">{product.data.name}</span>
-    </nav>
-
-    <div class="grid lg:grid-cols-2 gap-12">
-      <!-- 左側: 商品画像 -->
-      <div>
-        <div class="sticky top-24">
-          <div class="bg-gray-100 rounded-lg overflow-hidden aspect-square">
-            {imageModule ? (
-              <Image
-                src={imageModule}
-                alt={product.data.name}
-                width={800}
-                height={800}
-                format="webp"
-                class="w-full h-full object-cover"
-              />
-            ) : (
-              <div class="w-full h-full flex items-center justify-center text-gray-400">
-                No Image
-              </div>
-            )}
-          </div>
-          
-          <!-- 商品情報 -->
-          <div class="mt-6 space-y-4">
-            <div>
-              <h3 class="text-sm font-semibold text-gray-700 mb-2">Product Type</h3>
-              <span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                {product.data.type}
-              </span>
-            </div>
-            
-            <div>
-              <h3 class="text-sm font-semibold text-gray-700 mb-2">Platform</h3>
-              <div class="flex flex-wrap gap-2">
-                {product.data.platform.map((plat: string) => (
-                  <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
-                    {plat}
-                  </span>
-                ))}
-              </div>
-            </div>
-            
-            {product.data.bundle && (
-              <div>
-                <span class="inline-flex items-center gap-2 bg-purple-50 text-purple-700 px-3 py-2 rounded-lg text-sm font-semibold">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                  </svg>
-                  Bundle Deal
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <!-- 右側: 商品詳細とGumroad埋め込み -->
-      <div>
-        <h1 class="text-3xl md:text-4xl font-bold mb-4">{product.data.name}</h1>
-        
-        <div class="flex items-center gap-4 mb-8">
-          <span class="text-4xl font-bold text-gray-900">
-            {product.data.paid ? `${product.data.price}` : 'FREE'}
-          </span>
-          {!product.data.paid && (
-            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
-              Free Download
-            </span>
-          )}
-        </div>
-
-        <!-- Gumroad Embed -->
-        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <div class="gumroad-product-embed" data-gumroad-product-id={gumroadProductId}>
-            <a href={product.data.gumroadUrl}>Loading...</a>
-          </div>
-        </div>
-
-        <!-- デモ版ダウンロード -->
-        {product.data.demoUrl && (
-          <div class="bg-linear-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6 mb-8">
-            <div class="flex items-start gap-4">
-              <div class="shrink-0">
-                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                </svg>
-              </div>
-              <div class="flex-1">
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Try Demo Version</h3>
-                <p class="text-sm text-gray-600 mb-4">
-                  購入前にデモ版をお試しいただけます。製品の一部機能をご体験ください。
-                </p>
-                <a 
-                  href={product.data.demoUrl}
-                  download
-                  class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md hover:shadow-lg"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                  </svg>
-                  Download Demo
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <!-- Markdown コンテンツ -->
-        <div class="prose prose-sm md:prose-base max-w-none mb-8">
-          <Content />
-        </div>
-
-        <!-- 追加情報 -->
-        <div class="bg-gray-50 rounded-lg p-6 mb-8">
-          <h3 class="text-xl font-bold mb-4">Product Details</h3>
-          <div class="space-y-3 text-sm">
-            <div class="flex justify-between">
-              <span class="text-gray-600">Product ID:</span>
-              <span class="font-semibold">{product.id}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Release Date:</span>
-              <span class="font-semibold">{new Date(product.data.date).toLocaleDateString()}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Type:</span>
-              <span class="font-semibold">{product.data.type}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 戻るボタン -->
-        <div class="mt-8">
-          <a 
-            href="/store" 
-            class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Back to Store
-          </a>
-        </div>
-      </div>
+    <div class="border-b border-gray-900">
+      <nav class="container mx-auto px-4 py-4 text-sm text-gray-700">
+        <a href="/" class="hover:text-gray-900 transition">Home</a>
+        <span class="mx-2">/</span>
+        <a href="/store" class="hover:text-gray-900 transition">Store</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900 font-medium">{product.data.name}</span>
+      </nav>
     </div>
 
-    <!-- 関連商品セクション -->
-    {relatedProducts.length > 0 && (
-      <div class="mt-16">
-        <h2 class="text-2xl font-bold mb-6">More Products</h2>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {relatedProducts.map((rp: CollectionEntry<'products'>) => (
-            <a 
-              href={`/products/${rp.id}`}
-              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-            >
-              <div class="aspect-square bg-gray-200">
-                {relatedImagesMap.has(rp.id) ? (
-                  <Image
-                    src={relatedImagesMap.get(rp.id)!}
-                    alt={rp.data.name}
-                    width={400}
-                    height={400}
-                    format="webp"
-                    class="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div class="w-full h-full flex items-center justify-center text-gray-400">
-                    No Image
+    <div class="container mx-auto px-4 py-12">
+      <div class="grid lg:grid-cols-2 gap-12">
+        <!-- 左側: 商品画像 -->
+        <div>
+          <div class="sticky top-24">
+            <div class="border-2 border-gray-900 overflow-hidden aspect-square bg-gray-50">
+              {imageModule ? (
+                <Image
+                  src={imageModule}
+                  alt={product.data.name}
+                  width={800}
+                  height={800}
+                  format="webp"
+                  class="w-full h-full object-cover"
+                />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center text-gray-400">
+                  <span class="text-lg">No Image</span>
+                </div>
+              )}
+            </div>
+            
+            <!-- 商品メタ情報 - 横並び -->
+            <div class="mt-8 border-t-2 border-gray-900 pt-6">
+              <div class="flex flex-wrap gap-8">
+                <div>
+                  <h3 class="text-xs font-bold text-gray-900 mb-3 uppercase tracking-wider">Type</h3>
+                  <span class="inline-block border border-gray-900 text-gray-900 px-3 py-2 text-sm font-medium">
+                    {product.data.type}
+                  </span>
+                </div>
+                
+                <div>
+                  <h3 class="text-xs font-bold text-gray-900 mb-3 uppercase tracking-wider">Platform</h3>
+                  <div class="flex flex-wrap gap-2">
+                    {product.data.platform.map((plat: string) => (
+                      <span class="inline-block bg-gray-900 text-white px-3 py-2 text-sm font-medium whitespace-nowrap">
+                        {plat}
+                      </span>
+                    ))}
                   </div>
-                )}
+                </div>
               </div>
-              <div class="p-4">
-                <h3 class="font-semibold text-sm mb-2 line-clamp-2">{rp.data.name}</h3>
-                <span class="text-lg font-bold">
-                  {rp.data.paid ? `${rp.data.price}` : 'FREE'}
-                </span>
-              </div>
+              {product.data.bundle && (
+                <div class="mt-6">
+                  <span class="inline-flex items-center gap-2 border-2 border-gray-900 text-gray-900 px-4 py-2 text-sm font-bold">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    Bundle Deal
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <!-- 右側: 商品詳細 -->
+        <div>
+          <h1 class="text-3xl md:text-4xl font-bold mb-6 text-gray-900 leading-tight">{product.data.name}</h1>
+          <div class="flex items-baseline gap-4 mb-10 pb-10 border-b-2 border-gray-900">
+            <span class="text-3xl font-normal text-gray-900">
+              {product.data.paid ? `$${product.data.price}` : 'Free'}
+            </span>
+            {!product.data.paid && (
+              <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold uppercase tracking-wide">
+                Free Download
+              </span>
+            )}
+          </div>
+
+          <!-- 購入ボタン -->
+          <div class="mb-10">
+            <a
+              href={product.data.gumroadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block w-100 bg-gray-900 text-white text-center px-8 py-5 text-lg font-bold uppercase tracking-wide hover:bg-gray-900 transition-colors border-2 border-gray-900"
+            >
+              {product.data.paid ? `Purchase for $${product.data.price}` : 'Download Free'}
             </a>
-          ))}
+            <p class="text-xs text-gray-500 text-center mt-3 uppercase tracking-wide">
+              Powered by Gumroad
+            </p>
+          </div>
+
+          <!-- デモ版ダウンロード -->
+          {product.data.demoUrl && (
+            <div class="border-2 border-gray-900 p-6 mb-10">
+              <div class="flex items-start gap-4">
+                <div class="shrink-0 mt-1">
+                  <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-lg font-bold text-gray-900 mb-2 uppercase tracking-wide">Demo Version</h3>
+                  <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                    Try before you buy. Download a demo version to experience the product.
+                  </p>
+                  <a 
+                    href={product.data.demoUrl}
+                    download
+                    class="inline-block bg-white text-gray-900 border-2 border-gray-900 px-6 py-3 text-sm font-bold uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-colors"
+                  >
+                    Download Demo
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <!-- Markdown コンテンツ -->
+          <div class="prose prose-lg max-w-none mb-12">
+            <Content />
+          </div>
+
+          <!-- 戻るボタン -->
+          <div class="mt-12 pt-12 border-t border-gray-300">
+            <a 
+              href="/store" 
+              class="inline-flex items-center gap-2 text-gray-900 hover:text-gray-600 font-bold uppercase tracking-wide text-sm transition-colors"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Back to Store
+            </a>
+          </div>
         </div>
       </div>
-    )}
+
+      <!-- 関連商品セクション -->
+      {relatedProducts.length > 0 && (
+        <div class="mt-24 pt-12 border-t-2 border-gray-900">
+          <h2 class="text-3xl font-bold mb-8 uppercase tracking-wide">Related Products</h2>
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {relatedProducts.map((rp: CollectionEntry<'products'>) => (
+              <a 
+                href={`/products/${rp.id}`}
+                class="group border-2 border-gray-900 overflow-hidden hover:bg-gray-900 transition-colors"
+              >
+                <div class="aspect-square bg-gray-100 overflow-hidden">
+                  {relatedImagesMap.has(rp.id) ? (
+                    <Image
+                      src={relatedImagesMap.get(rp.id)!}
+                      alt={rp.data.name}
+                      width={400}
+                      height={400}
+                      format="webp"
+                      class="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                    />
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                      <span class="text-sm">No Image</span>
+                    </div>
+                  )}
+                </div>
+                <div class="p-4 bg-white group-hover:bg-gray-950 transition-colors">
+                  <h3 class="font-light text-sm mb-2 line-clamp-2 group-hover:text-white transition-colors">{rp.data.name}</h3>
+                  <span class="text-xs font-light group-hover:text-white transition-colors">
+                    {rp.data.paid ? `$${rp.data.price}` : 'FREE'}
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   </div>
 </Layout>
 
-<!-- Gumroad Script -->
-<script is:inline src="https://gumroad.com/js/gumroad-embed.js"></script>
-
 <style>
-  .gumroad-product-embed {
-    min-height: 400px;
-  }
-
-  /* Markdownコンテンツのスタイル調整 */
+  /* Markdownコンテンツのモノクロスタイル */
   .prose {
     color: #374151;
   }
   
   .prose h2 {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     margin-bottom: 1rem;
     color: #111827;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #111827;
+    padding-bottom: 0.5rem;
   }
   
   .prose h3 {
     font-size: 1.25rem;
-    font-weight: 600;
-    margin-top: 1.5rem;
+    font-weight: 700;
+    margin-top: 2rem;
     margin-bottom: 0.75rem;
     color: #1f2937;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
   }
   
   .prose ul, .prose ol {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
     padding-left: 1.5rem;
   }
   
   .prose li {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.75;
   }
   
   .prose p {
-    margin-bottom: 1rem;
-    line-height: 1.75;
+    margin-bottom: 1.25rem;
+    line-height: 1.8;
+  }
+  
+  .prose strong {
+    color: #111827;
+    font-weight: 700;
   }
   
   .prose code {
     background-color: #f3f4f6;
-    padding: 0.125rem 0.25rem;
-    border-radius: 0.25rem;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid #e5e7eb;
     font-size: 0.875em;
+    font-family: 'Courier New', monospace;
+  }
+
+  .prose a {
+    color: #111827;
+    text-decoration: underline;
+    font-weight: 600;
+  }
+
+  .prose a:hover {
+    color: #4b5563;
   }
 </style>

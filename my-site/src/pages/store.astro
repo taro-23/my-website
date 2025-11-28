@@ -3,19 +3,30 @@
 import Layout from '../layouts/Layout.astro';
 import StoreLayout from '../components/StoreLayout';
 import Footer from '../components/Footer.astro';
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import type { Product } from '../data/productsdata';
 
 // Content Collectionから商品データを取得
 const productEntries = await getCollection('products');
 
-// products.tsと同じ形式に変換
-const products = productEntries.map((entry: CollectionEntry<'products'>) => ({
+// Product型に変換（シリアライズ可能な形式）
+const products: Product[] = productEntries.map((entry) => ({
   id: entry.id,
-  ...entry.data
+  name: entry.data.name,
+  price: entry.data.price,
+  type: entry.data.type,
+  platform: entry.data.platform,
+  paid: entry.data.paid,
+  bundle: entry.data.bundle,
+  image: entry.data.image,
+  gumroadUrl: entry.data.gumroadUrl,
+  date: entry.data.date,
+  demoUrl: entry.data.demoUrl,
 }));
 
+// 画像の最適化処理
 const productImages = import.meta.glob<{ default: ImageMetadata }>('../assets/img/*.png');
-const imagesMap = new Map();
+const imagesMap = new Map<string, string>();
 
 for (const product of products) {
   const imagePath = `../assets/img/${product.image}`;
@@ -31,16 +42,21 @@ for (const product of products) {
       });
       imagesMap.set(product.id, optimizedImage.src);
     } else {
+      console.warn(`Image not found for product: ${product.id} at ${imagePath}`);
       const placeholderUrl = `https://placehold.co/800x800/6366f1/ffffff?text=${encodeURIComponent(product.id)}`;
       imagesMap.set(product.id, placeholderUrl);
     }
   } catch (error) {
+    console.error(`Error loading image for product: ${product.id}`, error);
     const placeholderUrl = `https://placehold.co/800x800/6366f1/ffffff?text=${encodeURIComponent(product.id)}`;
     imagesMap.set(product.id, placeholderUrl);
   }
 }
 
-const imageMap = Object.fromEntries(imagesMap);
+const imageMap: Record<string, string> = Object.fromEntries(imagesMap);
+
+console.log('Products loaded:', products.length);
+console.log('Images loaded:', Object.keys(imageMap).length);
 ---
 
 <Layout title="Store - Music Store" isStorePage={true}>
