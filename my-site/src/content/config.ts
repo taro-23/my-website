@@ -1,6 +1,11 @@
 // src/content/config.ts
 import { defineCollection, z } from 'astro:content';
 
+const audioFileSchema = z.object({
+  title: z.string(),
+  url: z.string(),
+});
+
 const productsCollection = defineCollection({
   type: 'content',
   schema: z.object({
@@ -14,6 +19,7 @@ const productsCollection = defineCollection({
     gumroadUrl: z.string(),
     date: z.string(),
     demoUrl: z.string().optional(),
+    audioFiles: z.array(audioFileSchema).optional(),
   }),
 });
 

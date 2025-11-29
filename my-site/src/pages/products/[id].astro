@@ -3,6 +3,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
+import AudioPlayer from '../../components/AudioPlayer';
 
 export async function getStaticPaths() {
   const products = await getCollection('products');
@@ -178,6 +179,13 @@ for (const rp of relatedProducts) {
                   </a>
                 </div>
               </div>
+            </div>
+          )}
+
+          <!-- オーディオプレーヤー -->
+          {product.data.audioFiles && product.data.audioFiles.length > 0 && (
+            <div class="mb-10">
+              <AudioPlayer client:load audioFiles={product.data.audioFiles} />
             </div>
           )}
 
