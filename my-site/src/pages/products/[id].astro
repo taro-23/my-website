@@ -79,8 +79,8 @@ for (const rp of relatedProducts) {
                 <Image
                   src={imageModule}
                   alt={product.data.name}
-                  width={800}
-                  height={800}
+                  width={500}
+                  height={500}
                   format="webp"
                   class="w-full h-full object-cover"
                 />
@@ -128,10 +128,10 @@ for (const rp of relatedProducts) {
 
         <!-- 右側: 商品詳細 -->
         <div>
-          <h1 class="text-3xl md:text-4xl font-bold mb-6 text-gray-900 leading-tight">{product.data.name}</h1>
-          <div class="flex items-baseline gap-4 mb-10 pb-10 border-b-2 border-gray-900">
+          <div class="flex items-baseline gap-4 mb-8 pb-10 border-b-2 border-gray-900">
+            <h1 class="text-2xl md:text-2xl font-bold mb-6 text-gray-900 leading-tight">{product.data.name}</h1>
             <span class="text-3xl font-normal text-gray-900">
-              {product.data.paid ? `$${product.data.price}` : 'Free'}
+              {product.data.paid ? `$${product.data.price}` : ''}
             </span>
             {!product.data.paid && (
               <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold uppercase tracking-wide">
@@ -146,7 +146,7 @@ for (const rp of relatedProducts) {
               href={product.data.gumroadUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="block w-100 bg-gray-900 text-white text-center px-8 py-5 text-lg font-bold uppercase tracking-wide hover:bg-gray-900 transition-colors border-2 border-gray-900"
+              class="block w-full bg-gray-900 text-white text-center px-8 py-5 text-lg font-bold uppercase tracking-wide hover:bg-gray-900 transition-colors border-2 border-gray-900"
             >
               {product.data.paid ? `Purchase for $${product.data.price}` : 'Download Free'}
             </a>
@@ -165,7 +165,7 @@ for (const rp of relatedProducts) {
                   </svg>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-lg font-bold text-gray-900 mb-2 uppercase tracking-wide">Demo Version</h3>
+                  <h3 class="text-lg font-normal text-gray-900 mb-2 uppercase tracking-wide">Demo Version</h3>
                   <p class="text-sm text-gray-600 mb-4 leading-relaxed">
                     Try before you buy. Download a demo version to experience the product.
                   </p>
