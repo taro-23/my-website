@@ -38,7 +38,7 @@ export default function ProductCard({ product, imageSrc }: Props) {
           <h3 className="font-semibold text-base truncate pr-2 group-hover:text-slate-950 transition-colors">
             {product.name}
           </h3>
-          <span className="text-xs font-bold text-gray-900 whitespace-nowrap">
+          <span className="text-s font-normal text-gray-900 whitespace-nowrap">
             {product.paid ? `$${product.price}` : 'Free'}
           </span>
         </div>

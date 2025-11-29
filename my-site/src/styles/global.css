@@ -19,7 +19,7 @@ html {
 
 /* デフォルトフォント & 滑らかなレンダリング */
 body {
-  font-family: 'Space Mono', monospace;
+  font-family: 'Karla Variable', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: white;
