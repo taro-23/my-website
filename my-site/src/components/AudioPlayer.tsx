@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function AudioPlayer({ audioFiles }: Props) {
-  const [currentTrack, setCurrentTrack] = useState(0);
+  const [currentTrack, setCurrentTrack] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -24,11 +24,8 @@ export default function AudioPlayer({ audioFiles }: Props) {
     const updateTime = () => setCurrentTime(audio.currentTime);
     const updateDuration = () => setDuration(audio.duration);
     const handleEnded = () => {
-      if (currentTrack < audioFiles.length - 1) {
-        setCurrentTrack(prev => prev + 1);
-      } else {
-        setIsPlaying(false);
-      }
+      setIsPlaying(false);
+      setCurrentTrack(null);
     };
 
     audio.addEventListener('timeupdate', updateTime);
@@ -40,33 +37,40 @@ export default function AudioPlayer({ audioFiles }: Props) {
       audio.removeEventListener('loadedmetadata', updateDuration);
       audio.removeEventListener('ended', handleEnded);
     };
-  }, [currentTrack, audioFiles.length]);
+  }, []);
 
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef.current && currentTrack !== null) {
       audioRef.current.load();
-      if (isPlaying) {
-        audioRef.current.play();
-      }
+      audioRef.current.play();
+      setIsPlaying(true);
     }
   }, [currentTrack]);
 
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    
-    if (isPlaying) {
-      audioRef.current.pause();
+  const handleTrackClick = (index: number) => {
+    if (currentTrack === index && isPlaying) {
+      // 同じトラックをクリック = 一時停止/再生
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+    } else if (currentTrack === index && !isPlaying) {
+      // 一時停止中のトラックを再生
+      if (audioRef.current) {
+        audioRef.current.play();
+        setIsPlaying(true);
+      }
     } else {
-      audioRef.current.play();
+      // 別のトラックを選択
+      setCurrentTrack(index);
     }
-    setIsPlaying(!isPlaying);
   };
 
-  const skipTrack = (direction: 'prev' | 'next') => {
-    if (direction === 'prev') {
-      setCurrentTrack(prev => (prev > 0 ? prev - 1 : audioFiles.length - 1));
-    } else {
-      setCurrentTrack(prev => (prev < audioFiles.length - 1 ? prev + 1 : 0));
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = parseFloat(e.target.value);
+    setCurrentTime(time);
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
     }
   };
 
@@ -82,109 +86,123 @@ export default function AudioPlayer({ audioFiles }: Props) {
   if (audioFiles.length === 0) return null;
 
   return (
-    <div className="border-4 border-black bg-black p-1">
+    <div className="border border-gray-900 bg-white">
+      <style>{`
+        .audio-progress {
+          width: 100%;
+          height: 1px;
+          -webkit-appearance: none;
+          appearance: none;
+          background: transparent;
+          cursor: pointer;
+          outline: none;
+        }
+
+        .audio-progress::-webkit-slider-track {
+          background: #e5e7eb;
+          height: 1px;
+        }
+
+        .audio-progress::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 8px;
+          height: 8px;
+          background: #111827;
+          cursor: pointer;
+          border-radius: 50%;
+          margin-top: -3.5px;
+        }
+
+        .audio-progress::-moz-range-track {
+          background: #e5e7eb;
+          height: 1px;
+        }
+
+        .audio-progress::-moz-range-thumb {
+          width: 8px;
+          height: 8px;
+          background: #111827;
+          cursor: pointer;
+          border-radius: 50%;
+          border: none;
+        }
+
+        .audio-progress-bg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          background: #111827;
+          transition: width 0.1s linear;
+        }
+      `}</style>
+
       <audio ref={audioRef}>
-        <source src={audioFiles[currentTrack].url} type="audio/mpeg" />
+        {currentTrack !== null && (
+          <source src={audioFiles[currentTrack].url} type="audio/mpeg" />
+        )}
       </audio>
 
-      <div className="bg-green-50 border-2 border-black font-mono">
-        {/* ヘッダー */}
-        <div className="bg-black text-green-50 px-3 py-2 border-b-2 border-black flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-green-400 animate-pulse"></div>
-            <span className="text-xs font-bold tracking-wider">DEMO AUDIO</span>
-          </div>
-          <span className="text-xs">
-            {String(currentTrack + 1).padStart(2, '0')}/{String(audioFiles.length).padStart(2, '0')}
-          </span>
-        </div>
+      {/* ヘッダー */}
+      <div className="px-4 py-3 border-b border-gray-900">
+        <span className="text-xs uppercase tracking-wider font-medium">Demo Audio</span>
+      </div>
 
-        {/* 現在のトラック情報 */}
-        <div className="px-3 py-2 bg-green-100 border-b-2 border-black">
-          <div className="text-xs text-gray-900 mb-1 tracking-wide">NOW PLAYING:</div>
-          <div className="text-sm font-bold text-black truncate">
-            {audioFiles[currentTrack].title.toUpperCase()}
+      {/* プログレスバー（再生中のみ表示） */}
+      {currentTrack !== null && (
+        <div className="px-4 py-3 border-b border-gray-900">
+          <div className="text-xs text-gray-500 mb-2">
+            {audioFiles[currentTrack].title}
           </div>
-        </div>
-
-        {/* プログレスバー（ASCII風） */}
-        <div className="px-3 py-2 bg-green-50 border-b-2 border-black">
-          <div className="flex items-center gap-2 text-xs font-mono">
-            <span className="text-gray-700">{formatTime(currentTime)}</span>
-            <div className="flex-1 h-3 bg-white border border-black relative overflow-hidden">
+          <div className="space-y-1">
+            <div className="h-px bg-gray-200 relative">
               <div 
-                className="h-full bg-black transition-all duration-100"
+                className="audio-progress-bg"
                 style={{ width: `${progress}%` }}
-              >
-                <div className="h-full w-full" style={{
-                  backgroundImage: `repeating-linear-gradient(
-                    90deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(255,255,255,0.3) 2px,
-                    rgba(255,255,255,0.3) 4px
-                  )`
-                }}></div>
-              </div>
+              ></div>
             </div>
-            <span className="text-gray-700">{formatTime(duration)}</span>
+            <input
+              type="range"
+              min="0"
+              max={duration || 0}
+              value={currentTime}
+              onChange={handleSeek}
+              className="audio-progress"
+            />
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
           </div>
         </div>
+      )}
 
-        {/* コントロール */}
-        <div className="px-3 py-3 bg-green-50 border-b-2 border-black flex items-center justify-center gap-2">
+      {/* トラックリスト */}
+      <div className="divide-y divide-gray-200">
+        {audioFiles.map((file, index) => (
           <button
-            onClick={() => skipTrack('prev')}
-            className="w-12 h-12 bg-white border-2 border-black hover:bg-black hover:text-white transition-colors flex items-center justify-center font-bold text-xl"
-            aria-label="Previous track"
+            key={index}
+            onClick={() => handleTrackClick(index)}
+            className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+              currentTrack === index
+                ? 'bg-gray-900 text-white'
+                : 'hover:bg-gray-50 text-gray-900'
+            }`}
           >
-            ◄
-          </button>
-
-          <button
-            onClick={togglePlay}
-            className="w-16 h-12 bg-black text-white border-2 border-black hover:bg-white hover:text-black transition-colors flex items-center justify-center font-bold text-2xl"
-            aria-label={isPlaying ? 'Pause' : 'Play'}
-          >
-            {isPlaying ? '▮▮' : '►'}
-          </button>
-
-          <button
-            onClick={() => skipTrack('next')}
-            className="w-12 h-12 bg-white border-2 border-black hover:bg-black hover:text-white transition-colors flex items-center justify-center font-bold text-xl"
-            aria-label="Next track"
-          >
-            ►
-          </button>
-        </div>
-
-        {/* トラックリスト */}
-        <div className="max-h-40 overflow-y-auto bg-green-50">
-          {audioFiles.map((file, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentTrack(index)}
-              className={`w-full text-left px-3 py-2 text-xs font-mono border-b border-gray-300 transition-colors ${
-                currentTrack === index
-                  ? 'bg-black text-green-50'
-                  : 'hover:bg-green-100 text-black'
-              }`}
-            >
-              <span className="inline-block w-8">
-                {currentTrack === index ? '►' : ' '}
+            <div className="flex items-center gap-3">
+              <span className="text-xs w-6 flex-shrink-0 opacity-60">
                 {String(index + 1).padStart(2, '0')}
               </span>
-              <span className="tracking-wide">
-                {file.title.toUpperCase()}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        {/* フッター */}
-        <div className="bg-black text-green-50 px-3 py-1 text-center">
-          <span className="text-xs tracking-widest">READY.</span>
-        </div>
+              <span className="flex-1 truncate">{file.title}</span>
+              {currentTrack === index && (
+                <span className="text-xs flex-shrink-0 opacity-60">
+                  {isPlaying ? '►' : '❚❚'}
+                </span>
+              )}
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   );
