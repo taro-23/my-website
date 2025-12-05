@@ -45,7 +45,7 @@ export default function ProductCard({ product, imageSrc }: Props) {
         
         {/* タグ */}
         <div className="flex flex-wrap gap-1 mb-3 mt-1">
-           <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+           <span className="text-xs bg-gray-200 text-gray-950 px-2 py-1 rounded">
              {product.type}
            </span>
            {product.platform.slice(0, 2).map((plat) => (
