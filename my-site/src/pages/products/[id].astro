@@ -91,54 +91,62 @@ for (const rp of relatedProducts) {
                 </div>
               )}
             </div>
-            
-            <!-- 商品メタ情報 - 横並び -->
+
+<!--横並び -->
             <div class="mt-8 border-t-2 border-gray-900 pt-6">
               <div class="flex flex-wrap gap-8">
-                <div>
-                  <h3 class="text-xs font-bold text-gray-900 mb-3 uppercase tracking-wider">Type</h3>
-                  <span class="inline-block border border-gray-900 text-gray-900 px-3 py-2 text-sm font-medium">
-                    {product.data.type}
-                  </span>
-                </div>
-                
-                <div>
-                  <h3 class="text-xs font-bold text-gray-900 mb-3 uppercase tracking-wider">Platform</h3>
-                  <div class="flex flex-wrap gap-2">
-                    {product.data.platform.map((plat: string) => (
-                      <span class="inline-block bg-gray-900 text-white px-3 py-2 text-sm font-medium whitespace-nowrap">
-                        {plat}
-                      </span>
-                    ))}
-                  </div>
-                </div>
               </div>
-              {product.data.bundle && (
-                <div class="mt-6">
-                  <span class="inline-flex items-center gap-2 border-2 border-gray-900 text-gray-900 px-4 py-2 text-sm font-bold">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
-                    Bundle Deal
-                  </span>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
-        <!-- 右側: 商品詳細 -->
+<!-- 右側: 商品詳細 -->
         <div>
-          <div class="flex items-baseline gap-4 mb-8 pb-10 border-b-2 border-gray-900">
-            <h1 class="text-2xl md:text-2xl font-bold mb-6 text-gray-900 leading-tight">{product.data.name}</h1>
-            <span class="text-3xl font-normal text-gray-900">
-              {product.data.paid ? `$${product.data.price}` : ''}
-            </span>
-            {!product.data.paid && (
-              <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold uppercase tracking-wide">
-                Free Download
+          <div class="mb-8 pb-10 border-b-2 border-gray-900">
+            <div class="flex items-baseline gap-4 mb-6">
+              <h1 class="text-2xl md:text-2xl font-bold text-gray-900 leading-tight">{product.data.name}</h1>
+              <span class="text-3xl font-normal text-gray-900">
+                {product.data.paid ? `$${product.data.price}` : ''}
               </span>
-            )}
+              {!product.data.paid && (
+                <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold uppercase tracking-wide">
+                  Free Download
+                </span>
+              )}
+            </div>
+            
+            <!-- 商品メタ情報 - 商品名の下に配置 -->
+            <div class="flex flex-wrap gap-4 items-start">
+              <div>
+                <h3 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Type</h3>
+                <span class="inline-block border border-gray-900 text-gray-900 px-3 py-1.5 text-sm font-medium">
+                  {product.data.type}
+                </span>
+              </div>
+              
+              <div>
+                <h3 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Platform</h3>
+                <div class="flex flex-wrap gap-2">
+                  {product.data.platform.map((plat: string) => (
+                    <span class="inline-block bg-gray-900 text-white px-3 py-1.5 text-sm font-medium whitespace-nowrap">
+                      {plat}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {product.data.bundle && (
+                <div>
+                  <h3 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Special</h3>
+                  <span class="inline-flex items-center gap-2 border-2 border-gray-900 text-gray-900 px-3 py-1.5 text-sm font-bold">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    Bundle
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           <!-- 購入ボタン -->

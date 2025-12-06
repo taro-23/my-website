@@ -1,5 +1,5 @@
 // src/components/StoreLayout.tsx
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { Product } from '../data/productsdata';
 import ProductFilter from './ProductFilter';
 import ProductCard from './ProductCard';
@@ -12,14 +12,94 @@ interface Props {
 type SortOption = 'new' | 'price-low' | 'price-high';
 
 export default function StoreLayout({ products, imageMap }: Props) {
-  const [sortBy, setSortBy] = useState<SortOption>('new');
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState({
-    paid: null as boolean | null,
-    type: null as Product['type'] | null,
-    platform: [] as string[],
-    bundle: null as boolean | null,
-  });
+  
+  // URLからの初期状態を読み込む
+  const getInitialState = () => {
+    if (typeof window === 'undefined') {
+      return {
+        sortBy: 'new' as SortOption,
+        filters: {
+          paid: null as boolean | null,
+          type: null as Product['type'] | null,
+          platform: [] as string[],
+          bundle: null as boolean | null,
+        }
+      };
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    
+    return {
+      sortBy: (params.get('sort') as SortOption) || 'new',
+      filters: {
+        paid: params.get('paid') === 'true' ? true : params.get('paid') === 'false' ? false : null,
+        type: (params.get('type') as Product['type']) || null,
+        platform: params.get('platform')?.split(',').filter(Boolean) || [],
+        bundle: params.get('bundle') === 'true' ? true : params.get('bundle') === 'false' ? false : null,
+      }
+    };
+  };
+
+  const [sortBy, setSortBy] = useState<SortOption>(getInitialState().sortBy);
+  const [filters, setFilters] = useState(getInitialState().filters);
+
+  // URLを更新する関数
+  const updateURL = (newSortBy: SortOption, newFilters: typeof filters) => {
+    if (typeof window === 'undefined') return;
+
+    const params = new URLSearchParams();
+    
+    if (newSortBy !== 'new') {
+      params.set('sort', newSortBy);
+    }
+    
+    if (newFilters.paid !== null) {
+      params.set('paid', String(newFilters.paid));
+    }
+    
+    if (newFilters.type !== null) {
+      params.set('type', newFilters.type);
+    }
+    
+    if (newFilters.platform.length > 0) {
+      params.set('platform', newFilters.platform.join(','));
+    }
+    
+    if (newFilters.bundle !== null) {
+      params.set('bundle', String(newFilters.bundle));
+    }
+
+    const newURL = params.toString() 
+      ? `${window.location.pathname}?${params.toString()}`
+      : window.location.pathname;
+    
+    window.history.pushState({}, '', newURL);
+  };
+
+  // ソート変更時にURLを更新
+  const handleSortChange = (newSort: SortOption) => {
+    setSortBy(newSort);
+    updateURL(newSort, filters);
+  };
+
+  // フィルタ変更時にURLを更新
+  const handleFiltersChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+    updateURL(sortBy, newFilters);
+  };
+
+  // ブラウザの戻る/進むボタンに対応
+  useEffect(() => {
+    const handlePopState = () => {
+      const state = getInitialState();
+      setSortBy(state.sortBy);
+      setFilters(state.filters);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...products];
@@ -82,7 +162,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
           <div className="p-4">
             <ProductFilter 
               filters={filters} 
-              setFilters={setFilters} 
+              setFilters={handleFiltersChange} 
               allProducts={products}
             />
           </div>
@@ -125,7 +205,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
                         <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                           {filters.type}
                           <button
-                            onClick={() => setFilters({ ...filters, type: null, platform: [] })}
+                            onClick={() => handleFiltersChange({ ...filters, type: null, platform: [] })}
                             className="hover:text-blue-900"
                           >
                             ×
@@ -136,7 +216,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
                         <span key={plat} className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
                           {plat}
                           <button
-                            onClick={() => setFilters({ ...filters, platform: filters.platform.filter(p => p !== plat) })}
+                            onClick={() => handleFiltersChange({ ...filters, platform: filters.platform.filter(p => p !== plat) })}
                             className="hover:text-green-900"
                           >
                             ×
@@ -152,7 +232,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
                         <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
                           {filters.bundle ? 'Bundle' : 'Single'}
                           <button
-                            onClick={() => setFilters({ ...filters, bundle: null })}
+                            onClick={() => handleFiltersChange({ ...filters, bundle: null })}
                             className="hover:text-purple-900"
                           >
                             ×
@@ -163,7 +243,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
                         <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
                           {filters.paid ? 'Paid' : 'Free'}
                           <button
-                            onClick={() => setFilters({ ...filters, paid: null })}
+                            onClick={() => handleFiltersChange({ ...filters, paid: null })}
                             className="hover:text-yellow-900"
                           >
                             ×
@@ -179,7 +259,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
                   {/* ソートメニュー */}
                   <div className="flex items-center gap-4">
                     <button
-                      onClick={() => setSortBy('new')}
+                      onClick={() => handleSortChange('new')}
                       className={`sort-link text-xs font-medium transition relative ${
                         sortBy === 'new'
                           ? 'text-gray-900'
@@ -189,7 +269,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
                       New
                     </button>
                     <button
-                      onClick={() => setSortBy('price-low')}
+                      onClick={() => handleSortChange('price-low')}
                       className={`sort-link text-xs font-medium transition relative ${
                         sortBy === 'price-low'
                           ? 'text-gray-900'
@@ -199,7 +279,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
                       Low
                     </button>
                     <button
-                      onClick={() => setSortBy('price-high')}
+                      onClick={() => handleSortChange('price-high')}
                       className={`sort-link text-xs font-medium transition relative ${
                         sortBy === 'price-high'
                           ? 'text-gray-900'
@@ -237,11 +317,11 @@ export default function StoreLayout({ products, imageMap }: Props) {
                   </button>
                 </div>
 
-                <ProductFilter filters={filters} setFilters={setFilters} allProducts={products} />
+                <ProductFilter filters={filters} setFilters={handleFiltersChange} allProducts={products} />
 
                 <div className="mt-6 flex gap-2">
                   <button
-                    onClick={() => { setFilters({ paid: null, type: null, platform: [], bundle: null }); setShowFilters(false); }}
+                    onClick={() => { handleFiltersChange({ paid: null, type: null, platform: [], bundle: null }); setShowFilters(false); }}
                     className="flex-1 px-4 py-2 border rounded-md text-sm"
                   >
                     Reset
@@ -267,7 +347,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
                 <p className="text-gray-500 text-lg mb-2">No products found</p>
                 <p className="text-gray-400 text-sm mb-4">Try adjusting your filters</p>
                 <button
-                  onClick={() => setFilters({ paid: null, type: null, platform: [], bundle: null })}
+                  onClick={() => handleFiltersChange({ paid: null, type: null, platform: [], bundle: null })}
                   className="text-gray-600 hover:text-gray-800 font-medium text-sm"
                 >
                   Reset all filters
