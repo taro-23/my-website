@@ -31,18 +31,18 @@ export default function ProductCard({ product, imageSrc }: Props) {
         )}
       </div>
 
-      {/* 商品情報 */}
+{/* 商品情報 */}
       <div className="p-4 flex flex-col grow">
         {/* 名前と価格を同じ行に配置 */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-base truncate pr-2 group-hover:text-slate-950 transition-colors">
+          <h3 className="font-semibold text-base pr-2 group-hover:text-slate-950 transition-colors line-clamp-2 flex-1">
             {product.name}
           </h3>
-          <span className="text-s font-normal text-gray-900 whitespace-nowrap">
+          <span className="text-s font-normal text-gray-900 whitespace-nowrap shrink-0">
             {product.paid ? `$${product.price}` : 'Free'}
           </span>
         </div>
-        
+
         {/* タグ */}
         <div className="flex flex-wrap gap-1 mb-3 mt-1">
            <span className="text-xs bg-gray-200 text-gray-950 px-2 py-1 rounded">

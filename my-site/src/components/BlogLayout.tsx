@@ -1,54 +1,64 @@
-// src/components/StoreLayout.tsx
+// src/components/BlogLayout.tsx
 import { useState, useMemo } from 'react';
-import type { Product } from '../data/productsdata';
-import ProductFilter from './ProductFilter';
-import ProductCard from './ProductCard';
+import BlogFilter from './BlogFilter';
+import BlogCard from './BlogCard';
+
+interface BlogPost {
+  id: string;
+  title: string;
+  description: string;
+  publishDate: string;
+  tags: string[];
+  image: string;
+  author: string;
+}
 
 interface Props {
-  products: Product[];
+  posts: BlogPost[];
   imageMap: Record<string, string>;
 }
 
-type SortOption = 'new' | 'price-low' | 'price-high';
+type SortOption = 'new' | 'old';
 
-export default function StoreLayout({ products, imageMap }: Props) {
+export default function BlogLayout({ posts, imageMap }: Props) {
   const [sortBy, setSortBy] = useState<SortOption>('new');
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
-    paid: null as boolean | null,
-    type: null as Product['type'] | null,
-    platform: [] as string[],
-    bundle: null as boolean | null,
+    tags: [] as string[],
   });
 
-  const filteredAndSortedProducts = useMemo(() => {
-    let filtered = [...products];
+  // 利用可能なすべてのタグを取得
+  const availableTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    posts.forEach(post => {
+      post.tags.forEach(tag => tagSet.add(tag));
+    });
+    return Array.from(tagSet).sort();
+  }, [posts]);
 
-    if (filters.paid !== null) {
-      filtered = filtered.filter(p => p.paid === filters.paid);
-    }
-    if (filters.type !== null) {
-      filtered = filtered.filter(p => p.type === filters.type);
-    }
-    if (filters.platform.length > 0) {
-      filtered = filtered.filter(p => 
-        filters.platform.some(plat => p.platform.includes(plat))
+  // フィルタリングとソート
+  const filteredAndSortedPosts = useMemo(() => {
+    let filtered = [...posts];
+
+    if (filters.tags.length > 0) {
+      filtered = filtered.filter(post =>
+        filters.tags.some(tag => post.tags.includes(tag))
       );
     }
-    if (filters.bundle !== null) {
-      filtered = filtered.filter(p => p.bundle === filters.bundle);
-    }
 
+    // ソート
     if (sortBy === 'new') {
-      filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    } else if (sortBy === 'price-low') {
-      filtered.sort((a, b) => a.price - b.price);
-    } else if (sortBy === 'price-high') {
-      filtered.sort((a, b) => b.price - a.price);
+      filtered.sort((a, b) => 
+        new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+      );
+    } else if (sortBy === 'old') {
+      filtered.sort((a, b) => 
+        new Date(a.publishDate).getTime() - new Date(b.publishDate).getTime()
+      );
     }
 
     return filtered;
-  }, [products, filters, sortBy]);
+  }, [posts, filters, sortBy]);
 
   return (
     <div className="min-h-screen pt-16">
@@ -71,7 +81,8 @@ export default function StoreLayout({ products, imageMap }: Props) {
           transition: transform .18s cubic-bezier(.2,.8,.2,1);
           pointer-events: none;
         }
-        .sort-link.text-gray-900::after {
+        .sort-link:not(.bg-gray-900):hover::after,
+        .sort-link:not(.bg-gray-900):focus::after {
           transform: translate(-50%, -50%) rotate(-12deg) scaleX(1);
         }
       `}</style>
@@ -80,10 +91,10 @@ export default function StoreLayout({ products, imageMap }: Props) {
         {/* 左側: フィルター（固定） */}
         <aside className="hidden lg:block fixed left-0 top-16 w-56 h-[calc(100vh-4rem)] bg-white border-r border-gray-850 overflow-y-auto z-30">
           <div className="p-4">
-            <ProductFilter 
+            <BlogFilter 
               filters={filters} 
               setFilters={setFilters} 
-              allProducts={products}
+              availableTags={availableTags}
             />
           </div>
         </aside>
@@ -105,76 +116,38 @@ export default function StoreLayout({ products, imageMap }: Props) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                     </svg>
                     <span className="font-medium text-sm">Filter</span>
-                    {(filters.type || filters.platform.length > 0 || filters.bundle !== null || filters.paid !== null) && (
+                    {filters.tags.length > 0 && (
                       <span className="bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full min-w-5 text-center">
-                        {[
-                          filters.type ? 1 : 0,
-                          filters.platform.length,
-                          filters.bundle !== null ? 1 : 0,
-                          filters.paid !== null ? 1 : 0
-                        ].reduce((a, b) => a + b, 0)}
+                        {filters.tags.length}
                       </span>
                     )}
                   </button>
 
                   {/* アクティブフィルター表示 */}
-                  {(filters.type || filters.platform.length > 0 || filters.bundle !== null || filters.paid !== null) && (
+                  {filters.tags.length > 0 && (
                     <div className="hidden lg:flex items-center gap-2 flex-wrap">
                       <span className="text-xs text-gray-600 font-medium shrink-0">Active:</span>
-                      {filters.type && (
-                        <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                          {filters.type}
+                      {filters.tags.slice(0, 3).map((tag) => (
+                        <span key={tag} className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                          {tag}
                           <button
-                            onClick={() => setFilters({ ...filters, type: null, platform: [] })}
+                            onClick={() => setFilters({ ...filters, tags: filters.tags.filter(t => t !== tag) })}
                             className="hover:text-blue-900"
                           >
                             ×
                           </button>
                         </span>
-                      )}
-                      {filters.platform.slice(0, 2).map((plat) => (
-                        <span key={plat} className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                          {plat}
-                          <button
-                            onClick={() => setFilters({ ...filters, platform: filters.platform.filter(p => p !== plat) })}
-                            className="hover:text-green-900"
-                          >
-                            ×
-                          </button>
-                        </span>
                       ))}
-                      {filters.platform.length > 2 && (
+                      {filters.tags.length > 3 && (
                         <span className="text-xs text-gray-600">
-                          +{filters.platform.length - 2} more
-                        </span>
-                      )}
-                      {filters.bundle !== null && (
-                        <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
-                          {filters.bundle ? 'Bundle' : 'Single'}
-                          <button
-                            onClick={() => setFilters({ ...filters, bundle: null })}
-                            className="hover:text-purple-900"
-                          >
-                            ×
-                          </button>
-                        </span>
-                      )}
-                      {filters.paid !== null && (
-                        <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-                          {filters.paid ? 'Paid' : 'Free'}
-                          <button
-                            onClick={() => setFilters({ ...filters, paid: null })}
-                            className="hover:text-yellow-900"
-                          >
-                            ×
-                          </button>
+                          +{filters.tags.length - 3} more
                         </span>
                       )}
                     </div>
                   )}
                 </div>
 
-                {/* 右側: ソートと商品数 */}
+                {/* 右側: ソートと記事数 */}
                 <div className="flex items-center gap-3 shrink-0">
                   {/* ソートメニュー */}
                   <div className="flex items-center gap-4">
@@ -186,32 +159,22 @@ export default function StoreLayout({ products, imageMap }: Props) {
                           : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      New
+                      Newest
                     </button>
                     <button
-                      onClick={() => setSortBy('price-low')}
+                      onClick={() => setSortBy('old')}
                       className={`sort-link text-xs font-medium transition relative ${
-                        sortBy === 'price-low'
+                        sortBy === 'old'
                           ? 'text-gray-900'
                           : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      Low
-                    </button>
-                    <button
-                      onClick={() => setSortBy('price-high')}
-                      className={`sort-link text-xs font-medium transition relative ${
-                        sortBy === 'price-high'
-                          ? 'text-gray-900'
-                          : 'text-gray-500 hover:text-gray-700'
-                      }`}
-                    >
-                      High
+                      Oldest
                     </button>
                   </div>
 
                   <div className="text-gray-600 text-xs font-medium whitespace-nowrap">
-                    {filteredAndSortedProducts.length} products
+                    {filteredAndSortedPosts.length} posts
                   </div>
                 </div>
               </div>
@@ -237,11 +200,11 @@ export default function StoreLayout({ products, imageMap }: Props) {
                   </button>
                 </div>
 
-                <ProductFilter filters={filters} setFilters={setFilters} allProducts={products} />
+                <BlogFilter filters={filters} setFilters={setFilters} availableTags={availableTags} />
 
                 <div className="mt-6 flex gap-2">
                   <button
-                    onClick={() => { setFilters({ paid: null, type: null, platform: [], bundle: null }); setShowFilters(false); }}
+                    onClick={() => { setFilters({ tags: [] }); setShowFilters(false); }}
                     className="flex-1 px-4 py-2 border rounded-md text-sm"
                   >
                     Reset
@@ -257,29 +220,29 @@ export default function StoreLayout({ products, imageMap }: Props) {
             </div>
           )}
 
-          {/* 商品グリッド（スクロール可能） */}
+          {/* 記事グリッド（3列） */}
           <div className="p-10 pb-0">
-            {filteredAndSortedProducts.length === 0 ? (
+            {filteredAndSortedPosts.length === 0 ? (
               <div className="text-center py-16">
                 <svg className="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <p className="text-gray-500 text-lg mb-2">No products found</p>
+                <p className="text-gray-500 text-lg mb-2">No posts found</p>
                 <p className="text-gray-400 text-sm mb-4">Try adjusting your filters</p>
                 <button
-                  onClick={() => setFilters({ paid: null, type: null, platform: [], bundle: null })}
+                  onClick={() => setFilters({ tags: [] })}
                   className="text-gray-600 hover:text-gray-800 font-medium text-sm"
                 >
                   Reset all filters
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredAndSortedProducts.map((product) => (
-                  <ProductCard 
-                    key={product.id} 
-                    product={product} 
-                    imageSrc={imageMap[product.id] || '/placeholder.png'}
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredAndSortedPosts.map((post) => (
+                  <BlogCard 
+                    key={post.id} 
+                    post={post} 
+                    imageSrc={imageMap[post.id] || '/placeholder.png'}
                   />
                 ))}
               </div>

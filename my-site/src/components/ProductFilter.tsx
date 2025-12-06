@@ -76,7 +76,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
       <div>
         <button
           onClick={handleReset}
-          className="w-full text-left px-1.5 py-1 rounded hover:bg-gray-100 transition text-xs"
+          className="w-full text-semibold-left px-1.5 py-1 rounded hover:bg-gray-100 transition text-xs"
         >
           All Products
         </button>

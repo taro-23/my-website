@@ -1,40 +1,61 @@
 ---
-// ========================================
 // src/pages/blog.astro
-// ========================================
 import Layout from '../layouts/Layout.astro';
+import BlogLayout from '../components/BlogLayout';
+import Footer from '../components/Footer.astro';
+import { getCollection } from 'astro:content';
+
+// ブログ記事を取得
+const blogEntries = await getCollection('blog');
+
+// シリアライズ可能な形式に変換
+const posts = blogEntries.map((entry) => ({
+  id: entry.id,
+  title: entry.data.title,
+  description: entry.data.description,
+  publishDate: entry.data.publishDate,
+  tags: entry.data.tags,
+  image: entry.data.image,
+  author: entry.data.author,
+}));
+
+// 画像の最適化処理
+const blogImages = import.meta.glob<{ default: ImageMetadata }>('../assets/img/blog/*.{png,jpg,jpeg}');
+const imagesMap = new Map<string, string>();
+
+for (const post of posts) {
+  const imagePath = `../assets/img/blog/${post.image}`;
+  
+  try {
+    if (blogImages[imagePath]) {
+      const image = await blogImages[imagePath]();
+      const { getImage } = await import('astro:assets');
+      const optimizedImage = await getImage({ 
+        src: image.default,
+        width: 800,
+        format: 'webp'
+      });
+      imagesMap.set(post.id, optimizedImage.src);
+    } else {
+      console.warn(`Image not found for post: ${post.id} at ${imagePath}`);
+      const placeholderUrl = `https://placehold.co/800x450/111827/ffffff?text=${encodeURIComponent(post.title)}`;
+      imagesMap.set(post.id, placeholderUrl);
+    }
+  } catch (error) {
+    console.error(`Error loading image for post: ${post.id}`, error);
+    const placeholderUrl = `https://placehold.co/800x450/111827/ffffff?text=${encodeURIComponent(post.title)}`;
+    imagesMap.set(post.id, placeholderUrl);
+  }
+}
+
+const imageMap: Record<string, string> = Object.fromEntries(imagesMap);
 ---
 
-<Layout title="Blog/News - kimura taro">
-  <div class="container mx-auto px-4 py-16">
-    <h1 class="text-4xl font-bold mb-8">Blog / News</h1>
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <article class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="aspect-video bg-gray-200"></div>
-        <div class="p-6">
-          <h2 class="text-xl font-bold mb-2">New Product Release</h2>
-          <p class="text-gray-600 mb-4">Our latest EDM bundle has been released...</p>
-          <a href="#" class="text-purple-600 hover:underline">Read more →</a>
-        </div>
-      </article>
-      
-      <article class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="aspect-video bg-gray-200"></div>
-        <div class="p-6">
-          <h2 class="text-xl font-bold mb-2">Production Tips</h2>
-          <p class="text-gray-600 mb-4">Learn how to use our wavetables effectively...</p>
-          <a href="#" class="text-purple-600 hover:underline">Read more →</a>
-        </div>
-      </article>
-      
-      <article class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="aspect-video bg-gray-200"></div>
-        <div class="p-6">
-          <h2 class="text-xl font-bold mb-2">Artist Spotlight</h2>
-          <p class="text-gray-600 mb-4">Featuring artists using our sample packs...</p>
-          <a href="#" class="text-purple-600 hover:underline">Read more →</a>
-        </div>
-      </article>
-    </div>
+<Layout title="Blog - kimura taro" isStorePage={true}>
+  <BlogLayout client:load posts={posts} imageMap={imageMap} />
+  
+  <!-- Footerをサイドバーの右側に配置 -->
+  <div class="lg:ml-56">
+    <Footer />
   </div>
 </Layout>

@@ -23,6 +23,19 @@ const productsCollection = defineCollection({
   }),
 });
 
+const blogCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    publishDate: z.string(),
+    tags: z.array(z.string()),
+    image: z.string(),
+    author: z.string().default('kimura taro'),
+  }),
+});
+
 export const collections = {
   products: productsCollection,
+  blog: blogCollection,
 };
