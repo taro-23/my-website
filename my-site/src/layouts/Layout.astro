@@ -23,6 +23,22 @@ const { title, description = 'Music Production Store', isStorePage = false } = A
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/my-23favicon.svg" />
+    
+    <!-- Google tag (gtag.js) -->
+    <script
+    is:inline
+    type="text/partytown"
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-G3J4447L1T"></script>
+      <script is:inline type="text/partytown">
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+      dataLayer.push(arguments);
+      }
+    gtag("js", new Date());
+    gtag('config', 'G-G3J4447L1T');
+  </script>
+<!-- Google tag (gtag.js) -->
     <title>{title}</title>
   </head>
   <body class="min-h-screen flex flex-col bg-white">
