@@ -6,12 +6,12 @@ import tailwindcss from '@tailwindcss/vite';
 import icon from 'astro-icon';
 
 
+import sitemap from '@astrojs/sitemap';
+
+
 export default defineConfig({
-  integrations: [
-    react(),
-    mdx(),
-    icon(),
-  ],
+  site: "https://kimurataro.com/",
+  integrations: [react(), mdx(), icon(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
   },
