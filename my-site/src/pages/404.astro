@@ -1,0 +1,104 @@
+---
+// src/pages/404.astro
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="404 - Page Not Found">
+  <div class="min-h-screen bg-white flex items-center justify-center px-4">
+    <div class="max-w-2xl w-full text-center">
+      <!-- 404 Large Number -->
+      <div class="mb-8">
+        <h1 class="text-[200px] md:text-[280px] font-bold leading-none text-gray-900 tracking-tighter">
+          404
+        </h1>
+      </div>
+
+      <!-- Error Message -->
+      <div class="mb-12 border-t-2 border-b-2 border-gray-900 py-8">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 uppercase tracking-wide">
+            Oops!
+        </h2>
+        <p class="text-lg text-gray-600 leading-relaxed">
+            The link you followed hit a dead note.
+            This page may have been moved or no longer exists.
+            You can return to the homepage or explore the latest sample packs, wavetables, and presets from the menu above.
+        </p>
+      </div>
+
+      <!-- Humorous Message -->
+      <div class="mb-12 bg-gray-50 border-2 border-gray-900 p-8">
+        <p class="text-sm text-gray-700 mb-4 font-mono">
+          🎵 ERROR: SOUND_FILE_NOT_FOUND.wav
+        </p>
+        <p class="text-gray-600 leading-relaxed">
+          This page has been filtered out of existence.
+        </p>
+      </div>
+
+      <!-- Navigation Options -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+        <a
+          href="/"
+          class="inline-flex items-center justify-center gap-2 bg-gray-900 text-white px-8 py-4 text-lg font-bold uppercase tracking-wide hover:bg-gray-700 transition-colors border-2 border-gray-900"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          Back to Home
+        </a>
+
+        <a
+          href="/store"
+          class="inline-flex items-center justify-center gap-2 bg-white text-gray-900 px-8 py-4 text-lg font-bold uppercase tracking-wide border-2 border-gray-900 hover:bg-gray-50 transition-colors"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+          </svg>
+          Browse Store
+        </a>
+      </div>
+
+      <!-- Additional Help Text -->
+      <div class="text-sm text-gray-500">
+        <p class="mb-2">
+          If you think this page should exist, please 
+          <a href="/contact" class="text-gray-900 font-bold underline hover:text-gray-600 transition">
+            let us know
+          </a>.
+        </p>
+        <p class="font-mono text-xs">
+          Error Code: 404 | Frequency: NOT_FOUND_Hz
+        </p>
+      </div>
+
+      <!-- Decorative Elements -->
+      <div class="mt-16 flex justify-center gap-4 text-gray-300">
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+        </svg>
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+        </svg>
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  /* Add a subtle animation to the 404 number */
+  h1 {
+    animation: subtle-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes subtle-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.85;
+    }
+  }
+</style>

@@ -1,36 +1,244 @@
 ---
 // src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard';
+import { getCollection } from 'astro:content';
+import type { Product } from '../data/productsdata';
+
+const props = Astro.props
+// 製品データを取得
+const productEntries = await getCollection('products');
+const products: Product[] = productEntries.map((entry) => ({
+  id: entry.id,
+  name: entry.data.name,
+  price: entry.data.price,
+  type: entry.data.type,
+  platform: entry.data.platform,
+  paid: entry.data.paid,
+  bundle: entry.data.bundle,
+  image: entry.data.image,
+  gumroadUrl: entry.data.gumroadUrl,
+  date: entry.data.date,
+  demoUrl: entry.data.demoUrl,
+}));
+
+// 最新の製品を取得
+const latestProducts = [...products]
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  .slice(0, 8);
+
+// 最新の製品
+const latestProduct = latestProducts[0];
+
+// ブログ記事を取得
+const blogEntries = await getCollection('blog');
+const latestPost = blogEntries.sort((a, b) => 
+  new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime()
+)[0];
+
+// 画像の最適化処理
+const productImages = import.meta.glob<{ default: ImageMetadata }>('../assets/img/*.png');
+const imagesMap = new Map<string, string>();
+
+for (const product of latestProducts) {
+  const imagePath = `../assets/img/${product.image}`;
+  
+  try {
+    if (productImages[imagePath]) {
+      const image = await productImages[imagePath]();
+      const { getImage } = await import('astro:assets');
+      const optimizedImage = await getImage({ 
+        src: image.default,
+        width: 600,
+        format: 'webp'
+      });
+      imagesMap.set(product.id, optimizedImage.src);
+    } else {
+      const placeholderUrl = `https://placehold.co/600x600/111827/ffffff?text=${encodeURIComponent(product.id)}`;
+      imagesMap.set(product.id, placeholderUrl);
+    }
+  } catch (error) {
+    const placeholderUrl = `https://placehold.co/600x600/111827/ffffff?text=${encodeURIComponent(product.id)}`;
+    imagesMap.set(product.id, placeholderUrl);
+  }
+}
+
+const imageMap: Record<string, string> = Object.fromEntries(imagesMap);
 ---
 
 <Layout title="kimura taro">
-  <!-- Hero Section -->
-  <section class="bg-white from-purple-600 to-blue-600 text-white py-20">
-    <div class="container mx-auto px-4 text-center">
-      <h1 class="text-black 6xl font-bold mb-6">
-        Synthetic Sounds
-      </h1>
-      <p class="text-black xl mb-8 max-w-2xl mx-auto">
-        高品質なシンセプリセットとサンプルパックであなたの音楽制作を次のレベルへ
-      </p>
-      <div class="flex gap-4 justify-center">
-        <a
+  <!-- 1ページ目: 2カラムレイアウト (2:1) -->
+  <section class="h-screen flex">
+    <!-- 左セクション: "Synthetic Sounds" + New Product (2/3幅) -->
+    <div class="w-2/3 border-r border-gray-900 flex flex-col">
+      <!-- ヘッダー部分 -->
+      <div class="border-b border-gray-900 px-8 py-6">
+        <h1 class="text-lg font-medium uppercase tracking-wider text-gray-900">
+          "Synthetic Sounds"
+        </h1>
+      </div>
+      
+      <!-- New Product セクション -->
+      <a 
+        href={`/products/${latestProduct?.id}`}
+        class="flex-1 flex flex-col hover:bg-gray-900 transition-colors group"
+      >
+        <div class="px-8 py-4 border-b border-gray-900">
+          <h2 class="text-sm font-medium uppercase tracking-wider group-hover:text-white transition-colors">
+            "New Product"
+          </h2>
+        </div>
+        
+        {latestProduct && (
+          <div class="flex-1 flex items-center justify-center p-8">
+            <div class="text-center max-w-md">
+              <div class="mb-6 aspect-square max-w-xs mx-auto overflow-hidden border border-gray-900">
+                <img 
+                  src={imageMap[latestProduct.id] || '/placeholder.png'}
+                  alt={latestProduct.name}
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <h3 class="text-xl font-medium mb-2 group-hover:text-white transition-colors">
+                {latestProduct.name}
+              </h3>
+              <p class="text-sm text-gray-600 group-hover:text-gray-300 transition-colors">
+                {latestProduct.paid ? `${latestProduct.price}` : 'Free'}
+              </p>
+            </div>
+          </div>
+        )}
+      </a>
+    </div>
+
+    <!-- 右セクション: カテゴリーリンク (1/3幅) -->
+    <div class="w-1/3 flex flex-col">
+      <!-- News -->
+      <a 
+        href={`/blog/${latestPost?.id}`}
+        class="flex-1 flex flex-col items-center justify-center hover:bg-gray-900 transition-colors border-b border-gray-900 group"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" {...props} class="text-gray-900 group-hover:text-white transition-colors">
+          <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            <circle cx="22.927" cy="16.794" r="8.327" />
+            <circle cx="22.927" cy="16.794" r="6.585" />
+            <circle cx="22.927" cy="16.794" r="1.791" />
+            <path d="M22.927 12.677a4.117 4.117 0 1 1-3.176 6.738m13.843 4.013V9.985h4.37c2.52 0 4.536 2.017 4.536 4.537s-2.016 4.537-4.537 4.537h-4.369M5.5 9.985h8.738M9.869 23.428V9.985" />
+          </g>
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M7.118 39.533v-9.827l6.511 9.827v-9.827m18.937 0l-2.457 9.827l-2.456-9.827l-2.457 9.827l-2.457-9.827m11.755 8.722c.615.737 1.352 1.105 2.457 1.105h1.474c1.351 0 2.457-1.105 2.457-2.457s-1.106-2.456-2.457-2.456h-1.597c-1.351 0-2.457-1.106-2.457-2.457s1.106-2.457 2.457-2.457h1.474c1.106 0 1.843.246 2.457 1.106M15.844 34.62h3.193m1.72 4.913h-4.913v-9.827h4.913" stroke-width="2" />
+        </svg>
+        <span class="text-sm font-medium uppercase tracking-wider text-gray-900 group-hover:text-white transition-colors">Latest News</span>
+      </a>
+      
+      <!-- Sample Pack -->
+      <a
+        href="/store?type=Sample+Pack"
+        class="flex-1 flex flex-col items-center justify-center hover:bg-gray-900 transition-colors border-b border-gray-900 group"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" {...props} class="text-gray-900 group-hover:text-white transition-colors">
+          <rect width="9" height="9" x="1.5" y="1.5" fill="currentColor" rx="1">
+            <animate id="SVGvBHXGeBR" attributeName="x" begin="0;SVGBBjjneux.end+0.15s" dur="0.6s" keyTimes="0;.2;1" values="1.5;.5;1.5" />
+            <animate attributeName="y" begin="0;SVGBBjjneux.end+0.15s" dur="0.6s" keyTimes="0;.2;1" values="1.5;.5;1.5" />
+            <animate attributeName="width" begin="0;SVGBBjjneux.end+0.15s" dur="0.6s" keyTimes="0;.2;1" values="9;11;9" />
+            <animate attributeName="height" begin="0;SVGBBjjneux.end+0.15s" dur="0.6s" keyTimes="0;.2;1" values="9;11;9" />
+          </rect>
+          <rect width="9" height="9" x="13.5" y="1.5" fill="currentColor" rx="1">
+            <animate attributeName="x" begin="SVGvBHXGeBR.begin+0.15s" dur="0.6s" keyTimes="0;.2;1" values="13.5;12.5;13.5" />
+            <animate attributeName="y" begin="SVGvBHXGeBR.begin+0.15s" dur="0.6s" keyTimes="0;.2;1" values="1.5;.5;1.5" />
+            <animate attributeName="width" begin="SVGvBHXGeBR.begin+0.15s" dur="0.6s" keyTimes="0;.2;1" values="9;11;9" />
+            <animate attributeName="height" begin="SVGvBHXGeBR.begin+0.15s" dur="0.6s" keyTimes="0;.2;1" values="9;11;9" />
+          </rect>
+          <rect width="9" height="9" x="13.5" y="13.5" fill="currentColor" rx="1">
+            <animate attributeName="x" begin="SVGvBHXGeBR.begin+0.3s" dur="0.6s" keyTimes="0;.2;1" values="13.5;12.5;13.5" />
+            <animate attributeName="y" begin="SVGvBHXGeBR.begin+0.3s" dur="0.6s" keyTimes="0;.2;1" values="13.5;12.5;13.5" />
+            <animate attributeName="width" begin="SVGvBHXGeBR.begin+0.3s" dur="0.6s" keyTimes="0;.2;1" values="9;11;9" />
+            <animate attributeName="height" begin="SVGvBHXGeBR.begin+0.3s" dur="0.6s" keyTimes="0;.2;1" values="9;11;9" />
+          </rect>
+          <rect width="9" height="9" x="1.5" y="13.5" fill="currentColor" rx="1">
+            <animate id="SVGBBjjneux" attributeName="x" begin="SVGvBHXGeBR.begin+0.45s" dur="0.6s" keyTimes="0;.2;1" values="1.5;.5;1.5" />
+            <animate attributeName="y" begin="SVGvBHXGeBR.begin+0.45s" dur="0.6s" keyTimes="0;.2;1" values="13.5;12.5;13.5" />
+            <animate attributeName="width" begin="SVGvBHXGeBR.begin+0.45s" dur="0.6s" keyTimes="0;.2;1" values="9;11;9" />
+            <animate attributeName="height" begin="SVGvBHXGeBR.begin+0.45s" dur="0.6s" keyTimes="0;.2;1" values="9;11;9" />
+          </rect>
+        </svg>
+        <span class="text-sm font-medium uppercase tracking-wider text-gray-900 group-hover:text-white transition-colors">Sample Pack</span>
+      </a>
+      
+      <!-- Wavetable -->
+      <a 
+        href="/store?type=Wavetable"
+        class="flex-1 flex flex-col items-center justify-center hover:bg-gray-900 transition-colors border-b border-gray-900 group"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" {...props} class="text-gray-900 group-hover:text-white transition-colors">
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M5.5 23.918c4.858-.266 9.23 5.056 12.956 6.817c5.815 2.75 9.113-2.626 13.077-5.753c4.396-3.47 7.63-3.682 10.966.844" stroke-width="2" />
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M5.503 26.592c6.512 3.968 11.18 3.719 14.82-3.445c2.765-5.445 4.662-10.57 6.807-9.454c3.605 1.876 5.964 14.882 11.147 17.125c1.52.657 2.852-2.428 4.22-4.713" stroke-width="2" />
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M42.5 20.419c-2.232 2.89-3.74 9.233-7.152 9.221c-4.264-.014-9.39-6.503-15.044-10.013c-5.757-3.573-10.707-1.45-14.804 3.383" stroke-width="2" />
+          <rect width="37" height="37" x="5.5" y="5.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" rx="4" ry="4" stroke-width="2" />
+        </svg>
+        <span class="text-sm font-medium uppercase tracking-wider text-gray-900 group-hover:text-white transition-colors">Wavetable</span>
+      </a>
+      
+      <!-- Synth Patch -->
+      <a 
+        href="/store?type=Patch+Pack"
+        class="flex-1 flex flex-col items-center justify-center hover:bg-gray-900 transition-colors group"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 16 16" {...props} class="text-gray-900 group-hover:text-white transition-colors">
+          <path fill="currentColor" d="M4 7a1 1 0 1 1 0 2a1 1 0 0 1 0-2m9 1a1 1 0 1 0-2 0a1 1 0 0 0 2 0m-1 2.7a1 1 0 1 0-2 0a1 1 0 0 0 2 0m-6 0a1 1 0 1 0-2 0a1 1 0 0 0 2 0M9 12a1 1 0 1 0-2 0a1 1 0 0 0 2 0" />
+          <path fill="currentColor" fill-rule="evenodd" d="M10 1.31V2.4c0 .56 0 .84-.109 1.05a1 1 0 0 1-.437.437c-.214.109-.494.109-1.05.109h-.8c-.56 0-.84 0-1.05-.109a1 1 0 0 1-.437-.437c-.109-.214-.109-.494-.109-1.05V1.31c0-.534-.505-.924-1-.724c-2.93 1.19-5 4.06-5 7.42c0 4.42 3.58 8 8 8s8-3.58 8-8c0-3.36-2.07-6.23-5-7.42c-.495-.2-1 .19-1 .724zm1 .368v.759c0 .252 0 .498-.017.706a2 2 0 0 1-.2.77a2 2 0 0 1-.875.874a2 2 0 0 1-.77.201c-.208.017-.454.017-.706.017h-.864c-.252 0-.498 0-.706-.017a2 2 0 0 1-.77-.201a2 2 0 0 1-.874-.874a2 2 0 0 1-.2-.77C5 2.935 5 2.689 5 2.437v-.759c-2.37 1.12-4 3.54-4 6.33c0 3.87 3.13 7 7 7s7-3.13 7-7c0-2.79-1.63-5.2-4-6.33" clip-rule="evenodd" />
+        </svg>
+        <span class="text-sm font-medium uppercase tracking-wider text-gray-900 group-hover:text-white transition-colors">Synth Patch</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 2ページ目: 製品カード4列 -->
+  <section class="min-h-screen bg-white py-16">
+    <div class="container mx-auto px-8">
+      <div class="mb-12">
+        <h2 class="text-3xl font-bold uppercase tracking-wide mb-2">products</h2>
+        <p class="text-gray-600">Browse my latest products</p>
+      </div>
+      
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        {latestProducts.map((product) => (
+          <ProductCard 
+            client:load
+            product={product}
+            imageSrc={imageMap[product.id] || '/placeholder.png'}
+          />
+        ))}
+      </div>
+      
+      <div class="mt-12 text-center">
+        <a 
           href="/store"
-          class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
+          class="inline-block bg-gray-900 text-white px-8 py-3 text-sm font-bold uppercase tracking-wide hover:bg-gray-700 transition-colors"
         >
-          ストアを見る
-        </a>
-        <a
-          href="/blog"
-          class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-purple-600 transition"
-        >
-          ブログを読む
+          View All Products
         </a>
       </div>
     </div>
   </section>
-
- 
-
-
 </Layout>
+
+<style>
+  /* セクション間の境界線を強調 */
+  section {
+    border-bottom: 2px solid #111827;
+  }
+  
+  /* ホバー時のアニメーション */
+  a {
+    transition: all 0.3s ease;
+  }
+  
+  /* アイコンのホバーエフェクト */
+  svg {
+    transition: transform 0.3s ease;
+  }
+  
+  a:hover svg {
+    transform: scale(1.1);
+  }
+</style>

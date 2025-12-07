@@ -39,6 +39,9 @@ type Props = {
 const { product, imageModule } = Astro.props;
 const { Content } = await product.render();
 
+// Product Typeをパンくずリスト用にエンコード
+const productTypeEncoded = encodeURIComponent(product.data.type);
+
 // 関連商品を取得
 const allProducts = await getCollection('products');
 const relatedProducts = allProducts
@@ -65,6 +68,8 @@ for (const rp of relatedProducts) {
         <a href="/" class="hover:text-gray-900 transition">Home</a>
         <span class="mx-2">/</span>
         <a href="/store" class="hover:text-gray-900 transition">Store</a>
+        <span class="mx-2">/</span>
+        <a href={`/store?type=${productTypeEncoded}`} class="hover:text-gray-900 transition">{product.data.type}</a>
         <span class="mx-2">/</span>
         <span class="text-gray-900 font-medium">{product.data.name}</span>
       </nav>
