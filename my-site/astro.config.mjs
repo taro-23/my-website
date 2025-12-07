@@ -9,7 +9,7 @@ import partytown from '@astrojs/partytown';
 
 
 export default defineConfig({
-  site: "https://kimurataro.com/",
+  site: "https://www.kimurataro.com/",
   integrations: [react(), mdx(), icon(), sitemap(), partytown({
       config: {
         forward: ["dataLayer.push"],
