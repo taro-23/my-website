@@ -70,8 +70,6 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
 
   return (
     <div className="space-y-3 text-xs">
-
-
       {/* All Products */}
       <div>
         <button
@@ -148,19 +146,19 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
         )}
       </div>
 
-      {/* Bundle (Accordion) */}
+      {/* Bundle (セクション全体クリック可能) */}
       <div className="border-t pt-3">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold mb-1 text-gray-900 text-[10px] uppercase tracking-wide">Bundle</h3>
-          <button
-            aria-expanded={openBundle}
-            aria-controls="bundle-panel"
-            onClick={() => setOpenBundle(prev => !prev)}
-            className="text-xs text-gray-600 hover:text-gray-900 transition"
-          >
+        <button
+          onClick={() => setOpenBundle(prev => !prev)}
+          className="w-full flex items-center justify-between hover:bg-gray-50 px-1.5 py-1 rounded transition cursor-pointer"
+          aria-expanded={openBundle}
+          aria-controls="bundle-panel"
+        >
+          <h3 className="font-semibold text-gray-900 text-[10px] uppercase tracking-wide">Bundle</h3>
+          <span className="text-xs text-gray-600">
             {openBundle ? '−' : '+'}
-          </button>
-        </div>
+          </span>
+        </button>
 
         <div id="bundle-panel" className={openBundle ? 'mt-2 space-y-1' : 'hidden'}>
           <div className="space-y-1">
@@ -195,19 +193,19 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
         </div>
       </div>
 
-      {/* Price (Accordion) */}
+      {/* Price (セクション全体クリック可能) */}
       <div className="border-t pt-3">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold mb-1 text-gray-900 text-[10px] uppercase tracking-wide">Price</h3>
-          <button
-            aria-expanded={openPrice}
-            aria-controls="price-panel"
-            onClick={() => setOpenPrice(prev => !prev)}
-            className="text-xs text-gray-600 hover:text-gray-900 transition"
-          >
+        <button
+          onClick={() => setOpenPrice(prev => !prev)}
+          className="w-full flex items-center justify-between hover:bg-gray-50 px-1.5 py-1 rounded transition cursor-pointer"
+          aria-expanded={openPrice}
+          aria-controls="price-panel"
+        >
+          <h3 className="font-semibold text-gray-900 text-[10px] uppercase tracking-wide">Price</h3>
+          <span className="text-xs text-gray-600">
             {openPrice ? '−' : '+'}
-          </button>
-        </div>
+          </span>
+        </button>
 
         <div id="price-panel" className={openPrice ? 'mt-2 space-y-1' : 'hidden'}>
           <div className="space-y-1">
