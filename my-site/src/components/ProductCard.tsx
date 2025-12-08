@@ -7,9 +7,12 @@ interface Props {
 }
 
 export default function ProductCard({ product, imageSrc }: Props) {
+  // product.idはすでに.mdxが削除されているはず
+  const productUrl = `/products/${product.id}`;
+  
   return (
     <a 
-      href={`/products/${product.id}`}
+      href={productUrl}
       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-full group"
     >
       {/* 商品画像 */}
@@ -31,7 +34,7 @@ export default function ProductCard({ product, imageSrc }: Props) {
         )}
       </div>
 
-{/* 商品情報 */}
+      {/* 商品情報 */}
       <div className="p-4 flex flex-col grow">
         {/* 名前と価格を同じ行に配置 */}
         <div className="flex items-start justify-between gap-2">
@@ -45,21 +48,21 @@ export default function ProductCard({ product, imageSrc }: Props) {
 
         {/* タグ */}
         <div className="flex flex-wrap gap-1 mb-3 mt-1">
-           <span className="text-xs bg-gray-200 text-gray-950 px-2 py-1 rounded">
-             {product.type}
-           </span>
-           {product.platform.slice(0, 2).map((plat) => (
-             <span key={plat} className="text-xs bg-zinc-900 text-gray-50 px-2 py-1 rounded">
-               {plat}
-             </span>
-           ))}
-           {product.platform.length > 2 && (
-             <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-               +{product.platform.length - 2}
-             </span>
-           )}
-         </div>
-       </div>
+          <span className="text-xs bg-gray-200 text-gray-950 px-2 py-1 rounded">
+            {product.type}
+          </span>
+          {product.platform.slice(0, 2).map((plat) => (
+            <span key={plat} className="text-xs bg-zinc-900 text-gray-50 px-2 py-1 rounded">
+              {plat}
+            </span>
+          ))}
+          {product.platform.length > 2 && (
+            <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+              +{product.platform.length - 2}
+            </span>
+          )}
+        </div>
+      </div>
     </a>
   );
 }

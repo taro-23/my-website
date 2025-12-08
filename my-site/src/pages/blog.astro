@@ -9,8 +9,9 @@ import { getCollection } from 'astro:content';
 const blogEntries = await getCollection('blog');
 
 // シリアライズ可能な形式に変換
+// .mdx拡張子を削除したスラッグを使用
 const posts = blogEntries.map((entry) => ({
-  id: entry.id,
+  id: entry.slug || entry.id.replace(/\.mdx?$/, ''),
   title: entry.data.title,
   description: entry.data.description,
   publishDate: entry.data.publishDate,
@@ -24,27 +25,34 @@ const blogImages = import.meta.glob<{ default: ImageMetadata }>('../assets/img/b
 const imagesMap = new Map<string, string>();
 
 for (const post of posts) {
-  const imagePath = `../assets/img/blog/${post.image}`;
+  // 元のエントリーから画像パスを取得
+  const originalEntry = blogEntries.find(e => 
+    (e.slug || e.id.replace(/\.mdx?$/, '')) === post.id
+  );
   
-  try {
-    if (blogImages[imagePath]) {
-      const image = await blogImages[imagePath]();
-      const { getImage } = await import('astro:assets');
-      const optimizedImage = await getImage({ 
-        src: image.default,
-        width: 800,
-        format: 'webp'
-      });
-      imagesMap.set(post.id, optimizedImage.src);
-    } else {
-      console.warn(`Image not found for post: ${post.id} at ${imagePath}`);
+  if (originalEntry) {
+    const imagePath = `../assets/img/blog/${originalEntry.data.image}`;
+    
+    try {
+      if (blogImages[imagePath]) {
+        const image = await blogImages[imagePath]();
+        const { getImage } = await import('astro:assets');
+        const optimizedImage = await getImage({ 
+          src: image.default,
+          width: 800,
+          format: 'webp'
+        });
+        imagesMap.set(post.id, optimizedImage.src);
+      } else {
+        console.warn(`Image not found for post: ${post.id} at ${imagePath}`);
+        const placeholderUrl = `https://placehold.co/800x450/111827/ffffff?text=${encodeURIComponent(post.title)}`;
+        imagesMap.set(post.id, placeholderUrl);
+      }
+    } catch (error) {
+      console.error(`Error loading image for post: ${post.id}`, error);
       const placeholderUrl = `https://placehold.co/800x450/111827/ffffff?text=${encodeURIComponent(post.title)}`;
       imagesMap.set(post.id, placeholderUrl);
     }
-  } catch (error) {
-    console.error(`Error loading image for post: ${post.id}`, error);
-    const placeholderUrl = `https://placehold.co/800x450/111827/ffffff?text=${encodeURIComponent(post.title)}`;
-    imagesMap.set(post.id, placeholderUrl);
   }
 }
 
