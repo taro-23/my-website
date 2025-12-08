@@ -5,6 +5,10 @@ import ProductCard from '../components/ProductCard';
 import { getCollection } from 'astro:content';
 import type { Product } from '../data/productsdata';
 
+// SEO用のメタデータ
+const seoTitle = "kimura taro - Sample Packs, Wavetables & Synth Patches";
+const seoDescription = "Discover sample packs, wavetables, and synth patches for music production. Free and premium sound design tools for electronic music producers.";
+
 const props = Astro.props
 // 製品データを取得
 const productEntries = await getCollection('products');

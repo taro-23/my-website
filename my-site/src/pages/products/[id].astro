@@ -44,6 +44,17 @@ type Props = {
 const { product, imageModule, slug } = Astro.props;
 const { Content } = await product.render();
 
+// SEO用のメタデータ
+const seoTitle = `${product.data.name} - kimura taro`;
+const seoDescription = product.data.type === 'Sample Pack' 
+  ? `${product.data.name} - High-quality ${product.data.type.toLowerCase()} for ${product.data.platform.join(', ')}. ${product.data.paid ? `${product.data.price}` : 'Free download'}.`
+  : `${product.data.name} - Professional ${product.data.type.toLowerCase()} for ${product.data.platform.join(', ')}. ${product.data.paid ? `${product.data.price}` : 'Free download'}.`;
+
+// 画像URLを生成
+const productImageUrl = imageModule 
+  ? new URL(`/assets/img/${product.data.image}`, Astro.site).href
+  : `https://placehold.co/1200x630/111827/ffffff?text=${encodeURIComponent(product.data.name)}`;
+
 // Product Typeをパンくずリスト用にエンコード
 const productTypeEncoded = encodeURIComponent(product.data.type);
 
@@ -65,7 +76,12 @@ for (const rp of relatedProducts) {
 }
 ---
 
-<Layout title={`${product.data.name} - Music Store`}>
+<Layout 
+  title={seoTitle}
+  description={seoDescription}
+  type="product"
+  image={productImageUrl}
+>
   <div class="bg-white min-h-screen">
     <!-- パンくずリスト -->
     <div class="border-b border-gray-900">

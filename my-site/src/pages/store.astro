@@ -65,9 +65,17 @@ const imageMap: Record<string, string> = Object.fromEntries(imagesMap);
 
 console.log('Products loaded:', products.length);
 console.log('Images loaded:', Object.keys(imageMap).length);
+
+// SEO用のメタデータ
+const seoTitle = "Store - Sample Packs, Wavetables & Synth Patches | kimura taro";
+const seoDescription = "Browse our collection of professional sample packs, wavetables, and synth patches. Specialized sounds for Elektron Analog Four, Analog Rytm, Machinedrum, and more. Free and premium downloads available.";
 ---
 
-<Layout title="Store-kimura taro" isStorePage={true}>
+<Layout 
+  title={seoTitle}
+  description={seoDescription}
+  isStorePage={true}
+>
   <StoreLayout client:load products={products} imageMap={imageMap} />
   
   <!-- Footerをサイドバーの右側に配置 -->

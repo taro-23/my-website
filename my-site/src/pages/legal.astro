@@ -3,9 +3,16 @@
 // src/pages/legal.astro
 // ========================================
 import Layout from '../layouts/Layout.astro';
+
+// SEO用のメタデータ
+const seoTitle = "Legal Notice & Terms | kimura taro";
+const seoDescription = "Legal information, terms of service, and policies for kimura taro's sample packs and digital products. Review our refund policy, licensing terms, and contact information.";
 ---
 
-<Layout title="Legal Notice - kimura taro">
+<Layout 
+  title={seoTitle}
+  description={seoDescription}
+>
   <div class="container mx-auto px-4 py-16">
     <h1 class="text-4xl font-bold mb-8">Legal Notice</h1>
     <div class="max-w-3xl space-y-6">      
@@ -65,7 +72,6 @@ import Layout from '../layouts/Layout.astro';
         <h2 class="text-2xl font-bold mb-4">Settlement period</h2>
         <p>Credit card and Paypal payments are processed immediately.</p>
       </section>
-    </div>
     </div>
   </div>
 </Layout>

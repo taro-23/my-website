@@ -3,8 +3,16 @@
 // src/pages/contact.astro
 // ========================================
 import Layout from '../layouts/Layout.astro';
+
+// SEO用のメタデータ
+const seoTitle = "Contact - Get in Touch | kimura taro";
+const seoDescription = "Have questions about our sample packs, wavetables, or synth patches? Contact me for support, custom sound design inquiries, or general questions about our products.";
 ---
-<Layout title="Contact - kimura taro">
+
+<Layout 
+  title={seoTitle}
+  description={seoDescription}
+>
   <div class="container mx-auto px-4 py-16">
     <h1 class="text-4xl font-bold mb-8">Contact</h1>
     <div class="max-w-2xl">

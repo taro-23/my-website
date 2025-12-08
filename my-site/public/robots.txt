@@ -1,4 +1,13 @@
+# Allow all crawlers
 User-agent: *
 Allow: /
 
-Sitemap: https://kimurataro/sitemap-index.xml
+# Sitemap location
+Sitemap: https://www.kimurataro.com/sitemap-index.xml
+
+# Crawl-delay for polite crawlers
+Crawl-delay: 1
+
+# Disallow certain paths if needed (example)
+# Disallow: /admin/
+# Disallow: /api/

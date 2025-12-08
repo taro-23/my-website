@@ -57,9 +57,17 @@ for (const post of posts) {
 }
 
 const imageMap: Record<string, string> = Object.fromEntries(imagesMap);
+
+// SEO用のメタデータ
+const seoTitle = "News & Blog - Updates and Insights | kimura taro";
+const seoDescription = "Stay updated with the latest news, product releases, and sound design insights. Explore blog for music production tips, gear reviews, and updates on new sample packs and patches.";
 ---
 
-<Layout title="News/Blog - kimura taro" isStorePage={true}>
+<Layout 
+  title={seoTitle}
+  description={seoDescription}
+  isStorePage={true}
+>
   <BlogLayout client:load posts={posts} imageMap={imageMap} />
   
   <!-- Footerをサイドバーの右側に配置 -->
