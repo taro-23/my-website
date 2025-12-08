@@ -18,11 +18,15 @@ export async function getStaticPaths() {
         imageModule = await productImages[imagePath]();
       }
       
+      // .mdx拡張子を削除したスラッグを使用
+      const slug = product.slug || product.id.replace(/\.mdx?$/, '');
+      
       return {
-        params: { id: product.id },
+        params: { id: slug },
         props: { 
           product,
-          imageModule: imageModule?.default || null
+          imageModule: imageModule?.default || null,
+          slug
         },
       };
     })
@@ -34,9 +38,10 @@ export async function getStaticPaths() {
 type Props = {
   product: CollectionEntry<'products'>;
   imageModule: ImageMetadata | null;
+  slug: string;
 };
 
-const { product, imageModule } = Astro.props;
+const { product, imageModule, slug } = Astro.props;
 const { Content } = await product.render();
 
 // Product Typeをパンくずリスト用にエンコード
@@ -97,7 +102,6 @@ for (const rp of relatedProducts) {
               )}
             </div>
 
-<!--横並び -->
             <div class="mt-8 border-t-2 border-gray-900 pt-6">
               <div class="flex flex-wrap gap-8">
               </div>
@@ -105,7 +109,7 @@ for (const rp of relatedProducts) {
           </div>
         </div>
 
-<!-- 右側: 商品詳細 -->
+        <!-- 右側: 商品詳細 -->
         <div>
           <div class="mb-8 pb-10 border-b-2 border-gray-900">
             <div class="flex items-baseline gap-4 mb-6">
@@ -120,7 +124,7 @@ for (const rp of relatedProducts) {
               )}
             </div>
             
-            <!-- 商品メタ情報 - 商品名の下に配置 -->
+            <!-- 商品メタ情報 -->
             <div class="flex flex-wrap gap-4 items-start">
               <div>
                 <h3 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Type</h3>
@@ -229,7 +233,7 @@ for (const rp of relatedProducts) {
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {relatedProducts.map((rp: CollectionEntry<'products'>) => (
               <a 
-                href={`/products/${rp.id}`}
+                href={`/products/${rp.slug || rp.id.replace(/\.mdx?$/, '')}`}
                 class="group border-2 border-gray-900 overflow-hidden hover:bg-gray-900 transition-colors"
               >
                 <div class="aspect-square bg-gray-100 overflow-hidden">
@@ -251,7 +255,7 @@ for (const rp of relatedProducts) {
                 <div class="p-4 bg-white group-hover:bg-gray-950 transition-colors">
                   <h3 class="font-light text-sm mb-2 line-clamp-2 group-hover:text-white transition-colors">{rp.data.name}</h3>
                   <span class="text-xs font-light group-hover:text-white transition-colors">
-                    {rp.data.paid ? `$${rp.data.price}` : 'FREE'}
+                    {rp.data.paid ? `${rp.data.price}` : 'FREE'}
                   </span>
                 </div>
               </a>
