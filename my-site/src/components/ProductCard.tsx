@@ -34,7 +34,7 @@ export default function ProductCard({ product, imageSrc }: Props) {
         )}
       </div>
 
-{/* 商品情報 */}
+      {/* 商品情報 */}
       <div className="p-4 flex flex-col grow">
         {/* 名前と価格を同じ行に配置 */}
         <div className="flex items-start justify-between gap-2">

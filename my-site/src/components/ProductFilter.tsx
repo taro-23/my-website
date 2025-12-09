@@ -40,7 +40,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
       .forEach(product => {
         product.platform.forEach(p => platforms.add(p));
       });
-    
+
     return Array.from(platforms).sort();
   }, [filters.type, allProducts]);
 
