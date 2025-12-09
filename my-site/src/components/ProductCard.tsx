@@ -34,11 +34,11 @@ export default function ProductCard({ product, imageSrc }: Props) {
         )}
       </div>
 
-      {/* 商品情報 */}
+{/* 商品情報 */}
       <div className="p-4 flex flex-col grow">
         {/* 名前と価格を同じ行に配置 */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-base pr-2 group-hover:text-slate-950 transition-colors line-clamp-2 flex-1">
+          <h3 className="font-semibold text-base pr-2 group-hover:text-slate-950 transition-colors flex-1 wrap-break-word">
             {product.name}
           </h3>
           <span className="text-s font-normal text-gray-900 whitespace-nowrap shrink-0">

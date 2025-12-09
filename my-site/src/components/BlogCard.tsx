@@ -56,7 +56,7 @@ export default function BlogCard({ post, imageSrc }: Props) {
         </div>
 
         {/* タイトル */}
-        <h3 className="font-bold text-xl mb-3 group-hover:text-gray-600 transition-colors line-clamp-2">
+        <h3 className="font-bold text-xl mb-3 group-hover:text-gray-600 transition-colors wrap-break-word">
           {post.title}
         </h3>
 

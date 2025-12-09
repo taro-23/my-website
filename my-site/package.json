@@ -15,6 +15,7 @@
     "@astrojs/sitemap": "^3.6.0",
     "@fontsource-variable/hanken-grotesk": "^5.2.8",
     "@fontsource-variable/maven-pro": "^5.2.10",
+    "@fontsource/unifontex": "^5.2.6",
     "@tailwindcss/vite": "^4.1.17",
     "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",

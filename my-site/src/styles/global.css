@@ -19,7 +19,7 @@ html {
 
 /* デフォルトフォント & 滑らかなレンダリング */
 body {
-  font-family: 'Hanken Grotesk Variable', sans-serif;
+  font-family: 'Hanken Grotesk Variable', sans-serif ,'UnifontEX', monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: white;
