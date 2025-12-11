@@ -338,7 +338,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
           )}
 
           {/* 商品グリッド（スクロール可能） */}
-          <div className="p-10 pb-0">
+          <div className="p-0 pb-0">
             {filteredAndSortedProducts.length === 0 ? (
               <div className="text-center py-16">
                 <svg className="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

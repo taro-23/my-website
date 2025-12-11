@@ -3,20 +3,19 @@ import type { Product } from '../data/productsdata';
 
 interface Props {
   product: Product;
-  imageSrc: string; // Astroから渡される最適化済み画像パス
+  imageSrc: string;
 }
 
 export default function ProductCard({ product, imageSrc }: Props) {
-  // product.idはすでに.mdxが削除されているはず
   const productUrl = `/products/${product.id}`;
   
   return (
     <a 
       href={productUrl}
-      className="bg-white border border-gray-900 hover:bg-gray-50 transition-colors flex flex-col h-full group p-4"
+      className="bg-white hover:bg-gray-50 transition-colors flex flex-col h-full group p-4"
     >
-      {/* 商品画像 - パディング内に配置 */}
-      <div className="relative aspect-square bg-gray-100 overflow-hidden mb-4">
+      {/* 商品画像 */}
+      <div className="relative aspect-square bg-gray-100 overflow-hidden mb-2">
         <img
           src={imageSrc}
           alt={product.name}
@@ -36,7 +35,7 @@ export default function ProductCard({ product, imageSrc }: Props) {
 
       {/* 商品情報 */}
       <div className="flex flex-col grow">
-        {/* 名前と価格を同じ行に配置 */}
+        {/* 名前と価格 */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="font-semibold text-sm group-hover:text-gray-600 transition-colors flex-1">
             {product.name}
