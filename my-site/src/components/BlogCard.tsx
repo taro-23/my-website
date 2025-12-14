@@ -24,13 +24,12 @@ export default function BlogCard({ post, imageSrc }: Props) {
     });
   };
 
-  // post.idはすでに.mdxが削除されているはず
   const postUrl = `/blog/${post.id}`;
 
   return (
     <a
       href={postUrl}
-      className="bg-white border-2 border-gray-900 overflow-hidden hover:bg-gray-50 transition-colors flex flex-col h-full group"
+      className="bg-white  hover:bg-gray-50 transition-colors flex flex-col h-full group"
     >
       {/* 記事画像 */}
       <div className="relative aspect-video bg-gray-200 overflow-hidden">

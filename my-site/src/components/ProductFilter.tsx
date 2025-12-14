@@ -74,15 +74,15 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
       <div>
         <button
           onClick={handleReset}
-          className="w-full text-semibold-left px-1.5 py-1 rounded hover:bg-gray-100 transition text-xs"
+          className="w-full font-bold text-semibold-left px-1.5 py-1 rounded hover:bg-gray-100 transition text-xs"
         >
-          All Products
+          RESET
         </button>
       </div>
 
       {/* Product Type */}
       <div className="border-t pt-3">
-        <h3 className="font-semibold mb-1 text-gray-900 text-[10px] uppercase tracking-wide">Type</h3>
+        <h3 className="font-semibold mb-1 text-gray-900 text-[12px] uppercase tracking-wide">Type</h3>
         <div className="space-y-1">
           <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
             <input
@@ -91,17 +91,17 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
               onChange={() => handleTypeChange(null)}
               className="w-3 h-3 text-blue-600"
             />
-            <span className="text-xs">All</span>
+            <span className="font-medium text-xs">All</span>
           </label>
           {typeOptions.map((type) => (
-            <label key={type} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
+            <label key={type} className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-1.5 py-1 rounded transition">
               <input
                 type="radio"
                 checked={filters.type === type}
                 onChange={() => handleTypeChange(type)}
                 className="w-3 h-3 text-blue-600"
               />
-              <span className="text-xs">{type}</span>
+              <span className="font-medium text-xs">{type}</span>
             </label>
           ))}
         </div>
@@ -110,7 +110,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
       {/* Platform */}
       <div className="border-t pt-3">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="font-semibold text-gray-900 text-[10px] uppercase tracking-wide">Platform</h3>
+          <h3 className="font-semibold text-gray-900 text-[12px] uppercase tracking-wide">Platform</h3>
           {filters.type && (
             <span className="text-xs text-gray-500">
               ({availablePlatforms.length})
@@ -138,7 +138,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
                     onChange={() => togglePlatform(plat)}
                     className="w-3 h-3 text-blue-600"
                   />
-                  <span className="text-xs leading-tight">{plat}</span>
+                  <span className="font-medium text-xs leading-tight">{plat}</span>
                 </label>
               );
             })}
@@ -154,7 +154,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
           aria-expanded={openBundle}
           aria-controls="bundle-panel"
         >
-          <h3 className="font-semibold text-gray-900 text-[10px] uppercase tracking-wide">Bundle</h3>
+          <h3 className="font-semibold text-gray-900 text-[12px] uppercase tracking-wide">Bundle</h3>
           <span className="text-xs text-gray-600">
             {openBundle ? '−' : '+'}
           </span>
@@ -178,7 +178,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
                 onChange={() => setFilters({ ...filters, bundle: true })}
                 className="w-3 h-3 text-blue-600"
               />
-              <span className="text-xs">Bundle</span>
+              <span className="font-medium text-xs">Bundle</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
               <input
@@ -187,7 +187,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
                 onChange={() => setFilters({ ...filters, bundle: false })}
                 className="w-3 h-3 text-blue-600"
               />
-              <span className="text-xs">Single</span>
+              <span className="font-medium text-xs">Single</span>
             </label>
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
           aria-expanded={openPrice}
           aria-controls="price-panel"
         >
-          <h3 className="font-semibold text-gray-900 text-[10px] uppercase tracking-wide">Price</h3>
+          <h3 className="font-semibold text-gray-900 text-[12px] uppercase tracking-wide">Price</h3>
           <span className="text-xs text-gray-600">
             {openPrice ? '−' : '+'}
           </span>
@@ -216,7 +216,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
                 onChange={() => setFilters({ ...filters, paid: null })}
                 className="w-3 h-3 text-blue-600"
               />
-              <span className="text-xs">All</span>
+              <span className="font-medium text-xs">All</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
               <input
@@ -225,7 +225,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
                 onChange={() => setFilters({ ...filters, paid: true })}
                 className="w-3 h-3 text-blue-600"
               />
-              <span className="text-xs">Paid</span>
+              <span className="font-medium text-xs">Paid</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
               <input
@@ -234,7 +234,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
                 onChange={() => setFilters({ ...filters, paid: false })}
                 className="w-3 h-3 text-blue-600"
               />
-              <span className="text-xs">Free</span>
+              <span className="font-medium text-xs">Free</span>
             </label>
           </div>
         </div>

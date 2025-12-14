@@ -27,7 +27,6 @@ export default function BlogLayout({ posts, imageMap }: Props) {
     tags: [] as string[],
   });
 
-  // 利用可能なすべてのタグを取得
   const availableTags = useMemo(() => {
     const tagSet = new Set<string>();
     posts.forEach(post => {
@@ -36,7 +35,6 @@ export default function BlogLayout({ posts, imageMap }: Props) {
     return Array.from(tagSet).sort();
   }, [posts]);
 
-  // フィルタリングとソート
   const filteredAndSortedPosts = useMemo(() => {
     let filtered = [...posts];
 
@@ -46,7 +44,6 @@ export default function BlogLayout({ posts, imageMap }: Props) {
       );
     }
 
-    // ソート
     if (sortBy === 'new') {
       filtered.sort((a, b) => 
         new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
@@ -86,9 +83,7 @@ export default function BlogLayout({ posts, imageMap }: Props) {
           transform: translate(-50%, -50%) rotate(-12deg) scaleX(1);
         }
       `}</style>
-      {/* 逆L字型レイアウト */}
       <div className="flex">
-        {/* 左側: フィルター（固定） */}
         <aside className="hidden lg:block fixed left-0 top-16 w-56 h-[calc(100vh-4rem)] bg-white border-r border-gray-850 overflow-y-auto z-30">
           <div className="p-4">
             <BlogFilter 
@@ -99,15 +94,11 @@ export default function BlogLayout({ posts, imageMap }: Props) {
           </div>
         </aside>
 
-        {/* 右側: メインコンテンツエリア */}
         <div className="w-full lg:ml-56">
-          {/* ソートバー（固定） */}
           <div className="sticky top-16 bg-white border-b border-gray-950 z-20">
             <div className="px-4 py-2">
               <div className="flex items-center justify-between gap-4">
-                {/* 左側: アクティブフィルター表示 */}
                 <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
-                  {/* モバイルフィルターボタン */}
                   <button
                     onClick={() => setShowFilters(!showFilters)}
                     className="lg:hidden flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition text-sm shrink-0"
@@ -123,7 +114,6 @@ export default function BlogLayout({ posts, imageMap }: Props) {
                     )}
                   </button>
 
-                  {/* アクティブフィルター表示 */}
                   {filters.tags.length > 0 && (
                     <div className="hidden lg:flex items-center gap-2 flex-wrap">
                       <span className="text-xs text-gray-600 font-medium shrink-0">Active:</span>
@@ -147,9 +137,7 @@ export default function BlogLayout({ posts, imageMap }: Props) {
                   )}
                 </div>
 
-                {/* 右側: ソートと記事数 */}
                 <div className="flex items-center gap-3 shrink-0">
-                  {/* ソートメニュー */}
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => setSortBy('new')}
@@ -181,13 +169,10 @@ export default function BlogLayout({ posts, imageMap }: Props) {
             </div>
           </div>
 
-          {/* モバイル固定オーバーレイ */}
           {showFilters && (
             <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Filters dialog">
-              {/* 背景遮蔽（クリックで閉じる） */}
               <div className="absolute inset-0 bg-black/50" onClick={() => setShowFilters(false)} />
 
-              {/* フィルター本体 */}
               <aside id="mobile-filters" className="absolute left-0 top-0 h-full w-full bg-white overflow-auto p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold">Filters</h2>
@@ -220,8 +205,7 @@ export default function BlogLayout({ posts, imageMap }: Props) {
             </div>
           )}
 
-          {/* 記事グリッド（3列） */}
-          <div className="p-10 pb-0">
+          <div className="p-10 pb-0 -mt-px">
             {filteredAndSortedPosts.length === 0 ? (
               <div className="text-center py-16">
                 <svg className="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,14 +221,21 @@ export default function BlogLayout({ posts, imageMap }: Props) {
                 </button>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredAndSortedPosts.map((post) => (
-                  <BlogCard 
-                    key={post.id} 
-                    post={post} 
-                    imageSrc={imageMap[post.id] || '/placeholder.png'}
-                  />
-                ))}
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-0">
+                {filteredAndSortedPosts.map((post, index, array) => {
+                  const isLastRow = index >= array.length - (array.length % 3 || 3);
+                  return (
+                    <div 
+                      key={post.id} 
+                      className={`border-r border-gray-900 ${!isLastRow ? 'border-b' : ''}`}
+                    >
+                      <BlogCard 
+                        post={post} 
+                        imageSrc={imageMap[post.id] || '/placeholder.png'}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
