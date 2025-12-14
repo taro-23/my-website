@@ -15,11 +15,11 @@ export default function ProductCard({ product, imageSrc }: Props) {
       className="bg-white hover:bg-gray-50 transition-colors flex flex-col h-full group relative"
     >
       {/* 商品画像 */}
-      <div className="relative aspect-square bg-gray-50 overflow-hidden p-14">
+      <div className="relative aspect-square  bg-gray-50 overflow-hidden p-12 ">
         <img
           src={imageSrc}
           alt={product.name}
-          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-xl/40"
         />
         {product.bundle && (
           <span className="absolute top-6 right-6 bg-gray-950 text-white text-xs px-2 py-1 font-semibold rounded">

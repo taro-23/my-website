@@ -191,12 +191,12 @@ export default function AudioPlayer({ audioFiles }: Props) {
             }`}
           >
             <div className="flex items-center gap-3">
-              <span className="text-xs w-6 flex-shrink-0 opacity-60">
+              <span className="text-xs w-6 shrink-0 opacity-60">
                 {String(index + 1).padStart(2, '0')}
               </span>
               <span className="flex-1 truncate">{file.title}</span>
               {currentTrack === index && (
-                <span className="text-xs flex-shrink-0 opacity-60">
+                <span className="text-xs shrink-0 opacity-60">
                   {isPlaying ? '►' : '❚❚'}
                 </span>
               )}
