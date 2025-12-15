@@ -68,9 +68,8 @@ const seoDescription = "Stay updated with the latest news, product releases, and
   description={seoDescription}
   isStorePage={true}
 >
-  <div class="min-h-[calc(100vh-4rem)]">
-    <BlogLayout client:load posts={posts} imageMap={imageMap} />
-  </div>
+  <BlogLayout client:load posts={posts} imageMap={imageMap} />
+  
   <!-- Footerをサイドバーの右側に配置 -->
   <div class="lg:ml-56">
     <Footer />

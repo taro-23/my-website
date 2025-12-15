@@ -128,7 +128,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
   
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="pt-16">
       <style>{`
         .sort-link { 
           position: relative; 
@@ -322,7 +322,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
             </div>
           )}
 
-          <div className="p-0 pb-0 mt-1px">
+          <div className="p-0 pb-0 mt-1px ]">
             {filteredAndSortedProducts.length === 0 ? (
               <div className="text-center py-16">
                 <svg className="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
