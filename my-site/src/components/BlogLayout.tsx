@@ -221,22 +221,16 @@ export default function BlogLayout({ posts, imageMap }: Props) {
                 </button>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-0">
-                {filteredAndSortedPosts.map((post, index, array) => {
-                  const isLastRow = index >= array.length - (array.length % 3 || 3);
-                  return (
-                    <div 
-                      key={post.id} 
-                      className={`border-r border-gray-900 ${!isLastRow ? 'border-b' : ''}`}
-                    >
-                      <BlogCard 
-                        post={post} 
-                        imageSrc={imageMap[post.id] || '/placeholder.png'}
-                      />
-                    </div>
-                  );
-                })}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-200">
+            {filteredAndSortedPosts.map((post) => (
+              <div key={post.id} className="bg-white">
+                <BlogCard 
+                  post={post} 
+                  imageSrc={imageMap[post.id] || '/placeholder.png'}
+                />
               </div>
+            ))}
+          </div>
             )}
           </div>
         </div>

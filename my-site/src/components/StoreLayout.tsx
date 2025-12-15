@@ -338,7 +338,7 @@ export default function StoreLayout({ products, imageMap }: Props) {
                 </button>
               </div>
             ) : (
-<div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-gray-200">
+<div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-gray-300">
   {filteredAndSortedProducts.map((product) => (
     <div key={product.id} className="bg-white">
       <ProductCard 
