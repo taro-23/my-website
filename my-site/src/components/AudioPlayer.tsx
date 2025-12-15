@@ -86,7 +86,7 @@ export default function AudioPlayer({ audioFiles }: Props) {
   if (audioFiles.length === 0) return null;
 
   return (
-    <div className="border border-gray-900 bg-white">
+    <div className="border border-gray-900 bg-white ">
       <style>{`
         .audio-progress {
           width: 100%;
@@ -187,7 +187,7 @@ export default function AudioPlayer({ audioFiles }: Props) {
             className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
               currentTrack === index
                 ? 'bg-gray-900 text-white'
-                : 'hover:bg-gray-50 text-gray-900'
+                : 'hover:bg-gray-100 text-gray-900'
             }`}
           >
             <div className="flex items-center gap-3">
