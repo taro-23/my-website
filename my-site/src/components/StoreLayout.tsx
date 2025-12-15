@@ -125,6 +125,8 @@ export default function StoreLayout({ products, imageMap }: Props) {
     return filtered;
   }, [products, filters, sortBy]);
 
+  
+
   return (
     <div className="min-h-screen pt-16">
       <style>{`
@@ -336,22 +338,16 @@ export default function StoreLayout({ products, imageMap }: Props) {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredAndSortedProducts.map((product, index, array) => {
-                  const isLastRow = index >= array.length - (array.length % 4 || 4);
-                  return (
-                    <div 
-                      key={product.id} 
-                      className={`border-r border-gray-900 ${!isLastRow ? 'border-b' : ''}`}
-                    >
-                      <ProductCard 
-                        product={product} 
-                        imageSrc={imageMap[product.id] || '/placeholder.png'}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
+<div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-gray-200">
+  {filteredAndSortedProducts.map((product) => (
+    <div key={product.id} className="bg-white">
+      <ProductCard 
+        product={product} 
+        imageSrc={imageMap[product.id] || '/placeholder.png'}
+      />
+    </div>
+  ))}
+</div>
             )}
           </div>
         </div>
