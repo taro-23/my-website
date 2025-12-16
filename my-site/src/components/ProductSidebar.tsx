@@ -49,19 +49,6 @@ export default function ProductSidebar({ currentType }: Props) {
         </div>
       </div>
 
-      {/* Active Filter */}
-      {currentType && (
-        <div className="border-t pt-3">
-          <h4 className="text-xs font-semibold mb-1 text-gray-700 uppercase tracking-wide">
-            Viewing
-          </h4>
-          <div className="flex flex-wrap gap-1">
-            <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs px-1.5 py-0.5 rounded">
-              {currentType}
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Quick Links */}
       <div className="border-t pt-3">

@@ -192,7 +192,7 @@ export default function AudioPlayer({ audioFiles }: Props) {
                 >
                   {/* 波形 */}
                   {isCurrentTrack && (
-                    <div className="absolute inset-0 flex items-center gap-[2px] px-4">
+                    <div className="absolute inset-0 flex items-center gap-0.5 px-4">
                       {waveforms[index]?.map((height, i) => (
                         <div
                           key={i}

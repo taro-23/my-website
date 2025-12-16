@@ -5,6 +5,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import AudioPlayer from '../../components/AudioPlayer';
 import ProductSidebar from '../../components/ProductSidebar';
+import Footer from '../../components/Footer.astro';
 
 export async function getStaticPaths() {
   const products = await getCollection('products');
@@ -106,12 +107,12 @@ for (const rp of relatedProducts) {
         </div>
 
         <!-- Product Detail Content -->
-        <div class="px-8 py-12">
-          <div class="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
+        <div class="px-4 sm:px-8 py-12">
+          <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-7xl mx-auto">
             <!-- Left: Product Image -->
             <div>
               <div class="sticky top-32">
-                <div class="border-2 border-gray-900 overflow-hidden aspect-square bg-gray-50 p-12">
+                <div class="border-2 border-gray-900 overflow-hidden aspect-square bg-gray-50 p-8 sm:p-12">
                   {imageModule ? (
                     <Image
                       src={imageModule}
@@ -133,13 +134,13 @@ for (const rp of relatedProducts) {
             <!-- Right: Product Info -->
             <div>
               <div class="mb-8 pb-8 border-b-2 border-gray-900">
-                <div class="flex items-baseline gap-4 mb-6">
-                  <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">{product.data.name}</h1>
-                  <span class="text-3xl font-normal text-gray-900">
+                <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 mb-6">
+                  <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight">{product.data.name}</h1>
+                  <span class="text-2xl sm:text-3xl font-normal text-gray-900">
                     {product.data.paid ? `$${product.data.price}` : ''}
                   </span>
                   {!product.data.paid && (
-                    <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold uppercase tracking-wide">
+                    <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold uppercase tracking-wide inline-block w-fit">
                       Free
                     </span>
                   )}
@@ -179,30 +180,29 @@ for (const rp of relatedProducts) {
                 </div>
               </div>
 
-<!-- デモ + 購入を一体化 -->
-<div class="mb-10 pl-5 pr-70">
-  <!-- 購入ボタン（目立つスタイル） -->
-    <a
-      href={product.data.gumroadUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="block w-full bg-gray-900 text-white text-center px-8 py-5 text-lg font-semibold uppercase tracking-wide hover:bg-gray-950 transition-colors border-2 border-gray-900"
-    >
-      {product.data.paid ? `ADD TO CART` : 'Download Free'}
-    </a>
-    <!-- デモ（補助導線） -->
-{product.data.demoUrl && (
-  <div class="text-center">
-    <a
-      href={product.data.demoUrl}
-      download
-      class="text-sm font-medium underline text-gray-700 hover:text-gray-900"
-    >
-      ⬇ TRY DEMO VERSION
-    </a>
-  </div>
-)}
-</div>
+              <!-- Purchase Button & Demo -->
+              <div class="mb-10">
+                <a
+                  href={product.data.gumroadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="block w-full bg-gray-900 text-white text-center px-6 py-4 sm:px-8 sm:py-5 text-base sm:text-lg font-semibold uppercase tracking-wide hover:bg-gray-950 transition-colors border-2 border-gray-900"
+                >
+                  {product.data.paid ? `ADD TO CART` : 'Download Free'}
+                </a>
+                
+                {product.data.demoUrl && (
+                  <div class="text-center mt-3">
+                    <a
+                      href={product.data.demoUrl}
+                      download
+                      class="text-sm font-medium underline text-gray-700 hover:text-gray-900"
+                    >
+                      ⬇ TRY DEMO VERSION
+                    </a>
+                  </div>
+                )}
+              </div>
 
               <!-- Audio Player -->
               {product.data.audioFiles && product.data.audioFiles.length > 0 && (
@@ -230,47 +230,14 @@ for (const rp of relatedProducts) {
               </div>
             </div>
           </div>
-
-          <!-- Related Products -->
-          {relatedProducts.length > 0 && (
-            <div class="mt-24 pt-12 border-t-2 border-gray-900 max-w-7xl mx-auto">
-              <h2 class="text-3xl font-bold mb-8 uppercase tracking-wide">Related Products</h2>
-              <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-gray-200">
-                {relatedProducts.map((rp: CollectionEntry<'products'>) => (
-                  <a 
-                    href={`/products/${rp.slug || rp.id.replace(/\.mdx?$/, '')}`}
-                    class="bg-white group overflow-hidden hover:bg-gray-50 transition-colors"
-                  >
-                    <div class="aspect-square bg-gray-100 overflow-hidden p-8">
-                      {relatedImagesMap.has(rp.id) ? (
-                        <Image
-                          src={relatedImagesMap.get(rp.id)!}
-                          alt={rp.data.name}
-                          width={400}
-                          height={400}
-                          format="webp"
-                          class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-xl"
-                        />
-                      ) : (
-                        <div class="w-full h-full flex items-center justify-center text-gray-400">
-                          <span class="text-sm">No Image</span>
-                        </div>
-                      )}
-                    </div>
-                    <div class="p-4">
-                      <h3 class="font-semibold text-sm mb-2 line-clamp-2 group-hover:text-gray-600 transition-colors">{rp.data.name}</h3>
-                      <span class="text-xs font-bold text-gray-900">
-                        {rp.data.paid ? `$${rp.data.price}` : 'FREE'}
-                      </span>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Footer on the right side of sidebar -->
+  <div class="lg:ml-56">
+    <Footer />
   </div>
 </Layout>
 
@@ -280,7 +247,7 @@ for (const rp of relatedProducts) {
   }
   
   .prose h2 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 700;
     margin-top: 2.5rem;
     margin-bottom: 1rem;
@@ -290,15 +257,27 @@ for (const rp of relatedProducts) {
     border-bottom: 2px solid #111827;
     padding-bottom: 0.5rem;
   }
+
+  @media (min-width: 640px) {
+    .prose h2 {
+      font-size: 1.75rem;
+    }
+  }
   
   .prose h3 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 700;
     margin-top: 2rem;
     margin-bottom: 0.75rem;
     color: #1f2937;
     text-transform: uppercase;
     letter-spacing: 0.025em;
+  }
+
+  @media (min-width: 640px) {
+    .prose h3 {
+      font-size: 1.25rem;
+    }
   }
   
   .prose ul, .prose ol {
@@ -328,15 +307,23 @@ for (const rp of relatedProducts) {
     border: 1px solid #e5e7eb;
     font-size: 0.875em;
     font-family: 'Courier New', monospace;
+    word-break: break-word;
   }
 
   .prose a {
     color: #111827;
     text-decoration: underline;
     font-weight: 600;
+    word-break: break-word;
   }
 
   .prose a:hover {
     color: #4b5563;
+  }
+
+  @media (max-width: 1023px) {
+    .prose {
+      font-size: 1rem;
+    }
   }
 </style>
