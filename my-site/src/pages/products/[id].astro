@@ -103,7 +103,7 @@ for (const rp of relatedProducts) {
             <!-- Left: Product Image -->
             <div>
               <div class="sticky top-32">
-                <div class="border-2 border-gray-900 overflow-hidden aspect-square bg-gray-50 p-8 sm:p-12">
+                <div class="border-2 border-gray-900 overflow-hidden aspect-square bg-gray-50 p-8 sm:p-12 ">
                   {imageModule ? (
                     <Image
                       src={imageModule}
@@ -111,7 +111,7 @@ for (const rp of relatedProducts) {
                       width={600}
                       height={600}
                       format="webp"
-                      class="w-full h-full object-contain drop-shadow-xl"
+                      class="w-full h-full object-contain drop-shadow-xl/80"
                     />
                   ) : (
                     <div class="w-full h-full flex items-center justify-center text-gray-400">
