@@ -1,4 +1,3 @@
-// src/components/AudioPlayer.tsx
 import { useState, useRef, useEffect } from 'react';
 
 interface AudioFile {
@@ -16,6 +15,18 @@ export default function AudioPlayer({ audioFiles }: Props) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [waveforms, setWaveforms] = useState<number[][]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const seekContainerRef = useRef<HTMLDivElement>(null);
+
+  // 波形データを生成
+  useEffect(() => {
+    const generateWaveform = () => {
+      const bars = 80;
+      return Array.from({ length: bars }, () => Math.random() * 0.7 + 0.3);
+    };
+    setWaveforms(audioFiles.map(() => generateWaveform()));
+  }, [audioFiles]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -25,7 +36,6 @@ export default function AudioPlayer({ audioFiles }: Props) {
     const updateDuration = () => setDuration(audio.duration);
     const handleEnded = () => {
       setIsPlaying(false);
-      setCurrentTrack(null);
     };
 
     audio.addEventListener('timeupdate', updateTime);
@@ -47,31 +57,55 @@ export default function AudioPlayer({ audioFiles }: Props) {
     }
   }, [currentTrack]);
 
+  // ドラッグ処理
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !seekContainerRef.current || !audioRef.current) return;
+
+      const rect = seekContainerRef.current.getBoundingClientRect();
+      const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+      const percentage = x / rect.width;
+      const newTime = percentage * duration;
+
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, duration]);
+
   const handleTrackClick = (index: number) => {
     if (currentTrack === index && isPlaying) {
-      // 同じトラックをクリック = 一時停止/再生
       if (audioRef.current) {
         audioRef.current.pause();
         setIsPlaying(false);
       }
     } else if (currentTrack === index && !isPlaying) {
-      // 一時停止中のトラックを再生
       if (audioRef.current) {
         audioRef.current.play();
         setIsPlaying(true);
       }
     } else {
-      // 別のトラックを選択
       setCurrentTrack(index);
     }
   };
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const time = parseFloat(e.target.value);
-    setCurrentTime(time);
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-    }
+  const handleSeekMouseDown = (index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (currentTrack !== index) return;
+    setIsDragging(true);
   };
 
   const formatTime = (time: number) => {
@@ -86,58 +120,7 @@ export default function AudioPlayer({ audioFiles }: Props) {
   if (audioFiles.length === 0) return null;
 
   return (
-    <div className="border border-gray-900 bg-white ">
-      <style>{`
-        .audio-progress {
-          width: 100%;
-          height: 1px;
-          -webkit-appearance: none;
-          appearance: none;
-          background: transparent;
-          cursor: pointer;
-          outline: none;
-        }
-
-        .audio-progress::-webkit-slider-track {
-          background: #e5e7eb;
-          height: 1px;
-        }
-
-        .audio-progress::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 8px;
-          height: 8px;
-          background: #111827;
-          cursor: pointer;
-          border-radius: 50%;
-          margin-top: -3.5px;
-        }
-
-        .audio-progress::-moz-range-track {
-          background: #e5e7eb;
-          height: 1px;
-        }
-
-        .audio-progress::-moz-range-thumb {
-          width: 8px;
-          height: 8px;
-          background: #111827;
-          cursor: pointer;
-          border-radius: 50%;
-          border: none;
-        }
-
-        .audio-progress-bg {
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          background: #111827;
-          transition: width 0.1s linear;
-        }
-      `}</style>
-
+    <div className="border border-gray-900 bg-white">
       <audio ref={audioRef}>
         {currentTrack !== null && (
           <source src={audioFiles[currentTrack].url} type="audio/mpeg" />
@@ -149,60 +132,131 @@ export default function AudioPlayer({ audioFiles }: Props) {
         <span className="text-xs uppercase tracking-wider font-medium">Demo Audio</span>
       </div>
 
-      {/* プログレスバー（再生中のみ表示） */}
-      {currentTrack !== null && (
-        <div className="px-4 py-3 border-b border-gray-900">
-          <div className="text-xs text-gray-500 mb-2">
-            {audioFiles[currentTrack].title}
-          </div>
-          <div className="space-y-1">
-            <div className="h-px bg-gray-200 relative">
-              <div 
-                className="audio-progress-bg"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max={duration || 0}
-              value={currentTime}
-              onChange={handleSeek}
-              className="audio-progress"
-            />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* トラックリスト */}
-      <div className="divide-y divide-gray-200">
-        {audioFiles.map((file, index) => (
-          <button
-            key={index}
-            onClick={() => handleTrackClick(index)}
-            className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-              currentTrack === index
-                ? 'bg-gray-900 text-white'
-                : 'hover:bg-gray-100 text-gray-900'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-xs w-6 shrink-0 opacity-60">
-                {String(index + 1).padStart(2, '0')}
-              </span>
-              <span className="flex-1 truncate">{file.title}</span>
-              {currentTrack === index && (
-                <span className="text-xs shrink-0 opacity-60">
-                  {isPlaying ? '►' : '❚❚'}
-                </span>
-              )}
+      <div>
+        {audioFiles.map((file, index) => {
+          const isCurrentTrack = currentTrack === index;
+          const trackProgress = isCurrentTrack ? progress : 0;
+          
+          return (
+            <div
+              key={index}
+              className={`border-b border-gray-200 last:border-b-0 ${
+                isCurrentTrack ? 'bg-gray-900' : 'bg-white hover:bg-gray-50'
+              } transition-colors`}
+            >
+              {/* 波形エリア */}
+              <div className="relative h-9 overflow-hidden flex">
+                {/* 左半分：トラック操作エリア（再生／停止） */}
+                <div
+                  className="w-1/2 px-4 flex items-center justify-between cursor-pointer z-10"
+                  onClick={() => handleTrackClick(index)}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`text-xs font-mono ${
+                      isCurrentTrack ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className={`text-sm font-medium ${
+                      isCurrentTrack ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      {file.title}
+                    </span>
+                  </div>
+
+                  {/* 再生/停止アイコン */}
+                  <div className={`w-5 h-5 flex items-center justify-center ${
+                    isCurrentTrack ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {isCurrentTrack && isPlaying ? (
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                        <rect x="6" y="4" width="4" height="16" />
+                        <rect x="14" y="4" width="4" height="16" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+
+                {/* 右半分：波形＋シーク専用エリア */}
+                <div
+                  ref={isCurrentTrack ? seekContainerRef : null}
+                  className={`relative w-1/2 h-full px-4 flex items-center ${
+                    isCurrentTrack ? 'cursor-pointer' : ''
+                  } ${isDragging ? 'cursor-grabbing' : ''}`}
+                  onMouseDown={(e) => handleSeekMouseDown(index, e)}
+                >
+                  {/* 波形 */}
+                  {isCurrentTrack && (
+                    <div className="absolute inset-0 flex items-center gap-[2px] px-4">
+                      {waveforms[index]?.map((height, i) => (
+                        <div
+                          key={i}
+                          className="flex-1"
+                          style={{
+                            height: `${height * 100}%`,
+                            backgroundColor:
+                              (i / waveforms[index].length) * 100 < trackProgress
+                                ? '#6b7280'
+                                : '#4b5563',
+                            minWidth: '1px',
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* 再生位置バー（右半分基準） */}
+                  {isCurrentTrack && (
+                    <div
+                      className="absolute top-0 bottom-0 w-1 bg-white z-20 pointer-events-none"
+                      style={{
+                        left: `calc(${trackProgress}%)`,
+                      }}
+                    />
+                  )}
+
+                  {/* 時間表示（右端） */}
+                  <div className="absolute right-4 flex items-center gap-2 pointer-events-none z-30">
+                    {isCurrentTrack && (
+                      <span className="text-xs font-mono text-white">
+                        {formatTime(currentTime)}
+                      </span>
+                    )}
+                    <span className={`text-xs font-mono ${
+                      isCurrentTrack ? 'text-white' : 'text-gray-600'
+                    }`}>
+                      {isCurrentTrack ? formatTime(duration) : '0:00'}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </button>
-        ))}
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// デモ用のサンプルデータ
+const sampleAudioFiles = [
+  { title: 'Wavetable Demo 1', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+  { title: 'Synthesis Test', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+  { title: 'Audio Sample 3', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+];
+
+// デモ用のラッパー
+function App() {
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6 text-gray-900">Audio Player with Draggable Seek</h1>
+        <AudioPlayer audioFiles={sampleAudioFiles} />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import AudioPlayer from '../../components/AudioPlayer';
+import ProductSidebar from '../../components/ProductSidebar';
 
 export async function getStaticPaths() {
   const products = await getCollection('products');
@@ -18,7 +19,6 @@ export async function getStaticPaths() {
         imageModule = await productImages[imagePath]();
       }
       
-      // .mdx拡張子を削除したスラッグを使用
       const slug = product.slug || product.id.replace(/\.mdx?$/, '');
       
       return {
@@ -44,21 +44,17 @@ type Props = {
 const { product, imageModule, slug } = Astro.props;
 const { Content } = await product.render();
 
-// SEO用のメタデータ
 const seoTitle = `${product.data.name} - kimura taro`;
 const seoDescription = product.data.type === 'Sample Pack' 
   ? `${product.data.name} - High-quality ${product.data.type.toLowerCase()} for ${product.data.platform.join(', ')}. ${product.data.paid ? `${product.data.price}` : 'Free download'}.`
   : `${product.data.name} - Professional ${product.data.type.toLowerCase()} for ${product.data.platform.join(', ')}. ${product.data.paid ? `${product.data.price}` : 'Free download'}.`;
 
-// 画像URLを生成
 const productImageUrl = imageModule 
   ? new URL(`/assets/img/${product.data.image}`, Astro.site).href
   : `https://placehold.co/1200x630/111827/ffffff?text=${encodeURIComponent(product.data.name)}`;
 
-// Product Typeをパンくずリスト用にエンコード
 const productTypeEncoded = encodeURIComponent(product.data.type);
 
-// 関連商品を取得
 const allProducts = await getCollection('products');
 const relatedProducts = allProducts
   .filter((p: CollectionEntry<'products'>) => p.id !== product.id && p.data.type === product.data.type)
@@ -81,210 +77,204 @@ for (const rp of relatedProducts) {
   description={seoDescription}
   type="product"
   image={productImageUrl}
+  isStorePage={true}
 >
-  <div class="bg-white min-h-screen">
-    <!-- パンくずリスト -->
-    <div class="border-b border-gray-900">
-      <nav class="container mx-auto px-4 py-4 text-sm text-gray-700">
-        <a href="/" class="hover:text-gray-900 transition">Home</a>
-        <span class="mx-2">/</span>
-        <a href="/store" class="hover:text-gray-900 transition">Store</a>
-        <span class="mx-2">/</span>
-        <a href={`/store?type=${productTypeEncoded}`} class="hover:text-gray-900 transition">{product.data.type}</a>
-        <span class="mx-2">/</span>
-        <span class="text-gray-900 font-medium">{product.data.name}</span>
-      </nav>
-    </div>
+  <div class="bg-white min-h-screen pt-16">
+    <div class="flex">
+      <!-- Left Sidebar -->
+      <aside class="hidden lg:block fixed left-0 top-16 w-56 h-[calc(100vh-4rem)] bg-white border-r border-gray-850 overflow-y-auto z-30">
+        <div class="p-4">
+          <ProductSidebar client:load currentType={product.data.type} />
+        </div>
+      </aside>
 
-    <div class="container mx-auto px-15 py-15">
-      <div class="grid lg:grid-cols-2 gap-15">
-        <!-- 左側: 商品画像 -->
-        <div>
-          <div class="sticky top-24 ">
-            <div class="border-2 border-gray-900 overflow-hidden aspect-square bg-gray-50 p-20 ">
-              {imageModule ? (
-                <Image
-                  src={imageModule}
-                  alt={product.data.name}
-                  width={500}
-                  height={500}
-                  format="webp"
-                  class="w-full h-full object-cover shadow-xl/80"
-                />
-              ) : (
-                <div class="w-full h-full flex items-center justify-center text-gray-400">
-                  <span class="text-lg">No Image</span>
-                </div>
-              )}
-            </div>
-
-            <div class="mt-8 border-t-2 border-gray-900 pt-6">
-              <div class="flex flex-wrap gap-8">
-              </div>
-            </div>
+      <!-- Main Content -->
+      <div class="w-full lg:ml-56">
+        <!-- Breadcrumb -->
+        <div class="sticky top-16 bg-white border-b border-gray-950 z-20">
+          <div class="px-4 py-2">
+            <nav class="text-sm text-gray-700">
+              <a href="/" class="hover:text-gray-900 transition">Home</a>
+              <span class="mx-2">/</span>
+              <a href="/store" class="hover:text-gray-900 transition">Store</a>
+              <span class="mx-2">/</span>
+              <a href={`/store?type=${productTypeEncoded}`} class="hover:text-gray-900 transition">{product.data.type}</a>
+              <span class="mx-2">/</span>
+              <span class="text-gray-900 font-medium">{product.data.name}</span>
+            </nav>
           </div>
         </div>
 
-        <!-- 右側: 商品詳細 -->
-        <div>
-          <div class="mb-8 pb-10 border-b-2 border-gray-900">
-            <div class="flex items-baseline gap-4 mb-6">
-              <h1 class="text-2xl md:text-2xl font-bold text-gray-900 leading-tight">{product.data.name}</h1>
-              <span class="text-3xl font-normal text-gray-900">
-                {product.data.paid ? `$${product.data.price}` : ''}
-              </span>
-              {!product.data.paid && (
-                <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold uppercase tracking-wide">
-                  Free Download
-                </span>
-              )}
-            </div>
-            
-            <!-- 商品メタ情報 -->
-            <div class="flex flex-wrap gap-4 items-start">
-              <div>
-                <h3 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Type</h3>
-                <span class="inline-block border border-gray-900 text-gray-900 px-3 py-1.5 text-sm font-medium">
-                  {product.data.type}
-                </span>
-              </div>
-              
-              <div>
-                <h3 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Platform</h3>
-                <div class="flex flex-wrap gap-2">
-                  {product.data.platform.map((plat: string) => (
-                    <span class="inline-block bg-gray-900 text-white px-3 py-1.5 text-sm font-medium whitespace-nowrap">
-                      {plat}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {product.data.bundle && (
-                <div>
-                  <h3 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Special</h3>
-                  <span class="inline-flex items-center gap-2 border-2 border-gray-900 text-gray-900 px-3 py-1.5 text-sm font-bold">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
-                    Bundle
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <!-- 購入ボタン -->
-          <div class="mb-10 pl-5 pr-70">
-            <a
-              href={product.data.gumroadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="block w-full bg-gray-900 text-white text-center px-8 py-5 text-lg font-bold uppercase tracking-wide hover:bg-gray-700 transition-colors border-2 border-gray-900 shadow-xl/20"
-            >
-              {product.data.paid ? `Purchase for $${product.data.price}` : 'Download Free'}
-            </a>
-            <p class="text-xs text-gray-500 text-center mt-3 uppercase tracking-wide">
-              Powered by Gumroad
-            </p>
-          </div>
-
-          <!-- デモ版ダウンロード -->
-          {product.data.demoUrl && (
-            <div class="border-2 border-gray-900 p-6 mb-10">
-              <div class="flex items-start gap-4">
-                <div class="shrink-0 mt-1">
-                  <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                  </svg>
-                </div>
-                <div class="flex-1">
-                  <h3 class="text-lg font-normal text-gray-900 mb-2 uppercase tracking-wide">Demo Version</h3>
-                  <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                    Try before you buy. Download a demo version to experience the product.
-                  </p>
-                  <a 
-                    href={product.data.demoUrl}
-                    download
-                    class="inline-block bg-white text-gray-900 border-2 border-gray-900 px-6 py-3 text-sm font-bold uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-colors"
-                  >
-                    Download Demo
-                  </a>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <!-- オーディオプレーヤー -->
-          {product.data.audioFiles && product.data.audioFiles.length > 0 && (
-            <div class="mb-10" >
-              <AudioPlayer client:load audioFiles={product.data.audioFiles} />
-            </div>
-          )}
-
-          <!-- Markdown コンテンツ -->
-          <div class="prose prose-lg max-w-none mb-12">
-            <Content />
-          </div>
-
-          <!-- 戻るボタン -->
-          <div class="mt-12 pt-12 border-t border-gray-300">
-            <a 
-              href="/store" 
-              class="inline-flex items-center gap-2 text-gray-900 hover:text-gray-600 font-bold uppercase tracking-wide text-sm transition-colors"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-              </svg>
-              Back to Store
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- 関連商品セクション -->
-      {relatedProducts.length > 0 && (
-        <div class="mt-24 pt-12 border-t-2 border-gray-900">
-          <h2 class="text-3xl font-bold mb-8 uppercase tracking-wide">Related Products</h2>
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {relatedProducts.map((rp: CollectionEntry<'products'>) => (
-              <a 
-                href={`/products/${rp.slug || rp.id.replace(/\.mdx?$/, '')}`}
-                class="group border-2 border-gray-900 overflow-hidden hover:bg-gray-900 transition-colors"
-              >
-                <div class="aspect-square bg-gray-100 overflow-hidden">
-                  {relatedImagesMap.has(rp.id) ? (
+        <!-- Product Detail Content -->
+        <div class="px-8 py-12">
+          <div class="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
+            <!-- Left: Product Image -->
+            <div>
+              <div class="sticky top-32">
+                <div class="border-2 border-gray-900 overflow-hidden aspect-square bg-gray-50 p-12">
+                  {imageModule ? (
                     <Image
-                      src={relatedImagesMap.get(rp.id)!}
-                      alt={rp.data.name}
-                      width={700}
-                      height={700}
+                      src={imageModule}
+                      alt={product.data.name}
+                      width={600}
+                      height={600}
                       format="webp"
-                      class="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                      class="w-full h-full object-contain drop-shadow-xl"
                     />
                   ) : (
                     <div class="w-full h-full flex items-center justify-center text-gray-400">
-                      <span class="text-sm">No Image</span>
+                      <span class="text-lg">No Image</span>
                     </div>
                   )}
                 </div>
-                <div class="p-4 bg-white group-hover:bg-gray-950 transition-colors">
-                  <h3 class="font-light text-sm mb-2 line-clamp-2 group-hover:text-white transition-colors">{rp.data.name}</h3>
-                  <span class="text-xs font-light group-hover:text-white transition-colors">
-                    {rp.data.paid ? `$${rp.data.price}` : 'FREE'}
+              </div>
+            </div>
+
+            <!-- Right: Product Info -->
+            <div>
+              <div class="mb-8 pb-8 border-b-2 border-gray-900">
+                <div class="flex items-baseline gap-4 mb-6">
+                  <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">{product.data.name}</h1>
+                  <span class="text-3xl font-normal text-gray-900">
+                    {product.data.paid ? `$${product.data.price}` : ''}
                   </span>
+                  {!product.data.paid && (
+                    <span class="bg-gray-900 text-white px-3 py-1 text-sm font-bold uppercase tracking-wide">
+                      Free
+                    </span>
+                  )}
                 </div>
-              </a>
-            ))}
+                
+                <!-- Product Meta -->
+                <div class="flex flex-wrap gap-4 items-start">
+                  <div>
+                    <h3 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Type</h3>
+                    <span class="inline-block border border-gray-900 text-gray-900 px-3 py-1.5 text-sm font-medium">
+                      {product.data.type}
+                    </span>
+                  </div>
+                  
+                  <div>
+                    <h3 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Platform</h3>
+                    <div class="flex flex-wrap gap-2">
+                      {product.data.platform.map((plat: string) => (
+                        <span class="inline-block bg-gray-900 text-white px-3 py-1.5 text-sm font-medium whitespace-nowrap">
+                          {plat}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {product.data.bundle && (
+                    <div>
+                      <h3 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Special</h3>
+                      <span class="inline-flex items-center gap-2 border-2 border-gray-900 text-gray-900 px-3 py-1.5 text-sm font-bold">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                        Bundle
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+<!-- デモ + 購入を一体化 -->
+<div class="mb-10 pl-5 pr-70">
+  <!-- 購入ボタン（目立つスタイル） -->
+    <a
+      href={product.data.gumroadUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="block w-full bg-gray-900 text-white text-center px-8 py-5 text-lg font-semibold uppercase tracking-wide hover:bg-gray-950 transition-colors border-2 border-gray-900"
+    >
+      {product.data.paid ? `ADD TO CART` : 'Download Free'}
+    </a>
+    <!-- デモ（補助導線） -->
+{product.data.demoUrl && (
+  <div class="text-center">
+    <a
+      href={product.data.demoUrl}
+      download
+      class="text-sm font-medium underline text-gray-700 hover:text-gray-900"
+    >
+      ⬇ TRY DEMO VERSION
+    </a>
+  </div>
+)}
+</div>
+
+              <!-- Audio Player -->
+              {product.data.audioFiles && product.data.audioFiles.length > 0 && (
+                <div class="mb-10">
+                  <AudioPlayer client:load audioFiles={product.data.audioFiles} />
+                </div>
+              )}
+
+              <!-- Markdown Content -->
+              <div class="prose prose-lg max-w-none mb-12">
+                <Content />
+              </div>
+
+              <!-- Back Button -->
+              <div class="mt-12 pt-12 border-t border-gray-300">
+                <a 
+                  href={`/store?type=${productTypeEncoded}`}
+                  class="inline-flex items-center gap-2 text-gray-900 hover:text-gray-600 font-bold uppercase tracking-wide text-sm transition-colors"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                  </svg>
+                  Back to {product.data.type}
+                </a>
+              </div>
+            </div>
           </div>
+
+          <!-- Related Products -->
+          {relatedProducts.length > 0 && (
+            <div class="mt-24 pt-12 border-t-2 border-gray-900 max-w-7xl mx-auto">
+              <h2 class="text-3xl font-bold mb-8 uppercase tracking-wide">Related Products</h2>
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-gray-200">
+                {relatedProducts.map((rp: CollectionEntry<'products'>) => (
+                  <a 
+                    href={`/products/${rp.slug || rp.id.replace(/\.mdx?$/, '')}`}
+                    class="bg-white group overflow-hidden hover:bg-gray-50 transition-colors"
+                  >
+                    <div class="aspect-square bg-gray-100 overflow-hidden p-8">
+                      {relatedImagesMap.has(rp.id) ? (
+                        <Image
+                          src={relatedImagesMap.get(rp.id)!}
+                          alt={rp.data.name}
+                          width={400}
+                          height={400}
+                          format="webp"
+                          class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-xl"
+                        />
+                      ) : (
+                        <div class="w-full h-full flex items-center justify-center text-gray-400">
+                          <span class="text-sm">No Image</span>
+                        </div>
+                      )}
+                    </div>
+                    <div class="p-4">
+                      <h3 class="font-semibold text-sm mb-2 line-clamp-2 group-hover:text-gray-600 transition-colors">{rp.data.name}</h3>
+                      <span class="text-xs font-bold text-gray-900">
+                        {rp.data.paid ? `$${rp.data.price}` : 'FREE'}
+                      </span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   </div>
 </Layout>
 
 <style>
-  /* Markdownコンテンツのモノクロスタイル */
   .prose {
     color: #374151;
   }
