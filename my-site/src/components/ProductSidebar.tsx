@@ -1,6 +1,7 @@
 // src/components/ProductSidebar.tsx
 interface Props {
   currentType: string;
+  currentPlatforms?: string[];
 }
 
 const productTypes = [
@@ -9,7 +10,7 @@ const productTypes = [
   'Wavetable',
 ] as const;
 
-export default function ProductSidebar({ currentType }: Props) {
+export default function ProductSidebar({ currentType, currentPlatforms = [] }: Props) {
   return (
     <div className="space-y-3 text-xs">
       {/* All Products */}
@@ -31,7 +32,7 @@ export default function ProductSidebar({ currentType }: Props) {
           {productTypes.map((type) => {
             const isActive = currentType === type;
             const typeParam = encodeURIComponent(type);
-            
+
             return (
               <a
                 key={type}
@@ -49,27 +50,27 @@ export default function ProductSidebar({ currentType }: Props) {
         </div>
       </div>
 
-
-      {/* Quick Links */}
-      <div className="border-t pt-3">
-        <h3 className="font-semibold mb-1 text-gray-900 text-[10px] uppercase tracking-wide">
-          Quick Links
-        </h3>
-        <div className="space-y-1">
-          <a
-            href="/store?paid=false"
-            className="block px-1.5 py-1 rounded hover:bg-gray-50 transition text-xs"
-          >
-            Free Products
-          </a>
-          <a
-            href="/store?bundle=true"
-            className="block px-1.5 py-1 rounded hover:bg-gray-50 transition text-xs"
-          >
-            Bundles
-          </a>
+      {/* Current Product Platform */}
+      {currentPlatforms.length > 0 && (
+        <div className="border-t pt-3">
+          <h3 className="font-semibold mb-1 text-gray-900 text-[12px] uppercase tracking-wide">
+            Platform
+          </h3>
+          <div className="space-y-1">
+            {currentPlatforms.map((platform) => (
+              <div
+                key={platform}
+                className="px-1.5 py-1 bg-gray-100 rounded text-xs font-medium text-gray-900"
+              >
+                {platform}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+
+
     </div>
   );
 }
