@@ -249,7 +249,7 @@ export default function AudioPlayer({ audioFiles }: Props) {
                     }`}>
                       {String(index + 1).padStart(2, '0')}
                     </span>
-                    <span className={`text-sm font-medium ${
+                    <span className={`text-xs font-medium font-mono ${
                       isCurrentTrack ? 'text-white' : 'text-gray-900'
                     }`}>
                       {file.title}
