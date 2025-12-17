@@ -228,7 +228,7 @@ export default function AudioPlayer({ audioFiles }: Props) {
           const isCurrentTrack = currentTrack === index;
           const trackProgress = isCurrentTrack ? progress : 0;
           const isLoading = loadingWaveforms[index];
-          
+
           return (
             <div
               key={index}
