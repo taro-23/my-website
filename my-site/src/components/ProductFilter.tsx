@@ -31,7 +31,7 @@ function CustomCheckbox({ checked }: { checked: boolean }) {
   return (
     <div className="w-4 h-4 flex items-center justify-center">
       {checked && (
-        <span className="text-base leading-none">✔</span>
+        <span className="text-base leading-none">🗸</span>
       )}
     </div>
   );

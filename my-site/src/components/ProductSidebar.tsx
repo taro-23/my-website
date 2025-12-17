@@ -37,13 +37,18 @@ export default function ProductSidebar({ currentType, currentPlatforms = [] }: P
               <a
                 key={type}
                 href={`/store?type=${typeParam}`}
-                className={`block px-1.5 py-1 rounded transition text-xs ${
-                  isActive
-                    ? 'bg-gray-900 text-white font-medium'
-                    : 'hover:bg-gray-50 font-medium'
+                className={`block px-1.5 py-1 rounded transition text-xs font-medium group ${
+                  isActive ? '' : 'hover:bg-gray-50'
                 }`}
               >
-                {type}
+                <span className="relative inline-block">
+                  {type}
+                  {isActive ? (
+                    <span className="absolute top-1/2 left-0 right-0 h-px bg-black"></span>
+                  ) : (
+                    <span className="absolute top-1/2 left-0 right-0 h-px bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                  )}
+                </span>
               </a>
             );
           })}
