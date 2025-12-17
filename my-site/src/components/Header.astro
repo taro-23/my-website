@@ -1,5 +1,7 @@
 ---
 // src/components/Header.astro
+
+
 ---
 
 <header class="fixed top-0 left-0 right-0 bg-white border-b border-gray-850 z-50 h-16">
@@ -7,27 +9,47 @@
     <div class="flex items-center h-full w-full">
       <!-- 左端の角: ホームリンク（固定幅） -->
       <a href="/" class="flex items-center justify-center w-56 h-full border-r border-gray-850 hover:bg-gray-850 transition">
-        <span class="text-xl font-light italic tracking-widest overline text-gray-900 ">kimura taro</span>
+        <span class="text-xl font-light italic tracking-widest overline text-gray-900 font-mono">kimura taro</span>
       </a>
 
       <!-- メインナビゲーション -->
       <div class="flex items-center h-full px-6 flex-1">
         <ul class="hidden md:flex items-center space-x-8">
-          <li><a href="/store" class="nav-link text-sm font-normal text-gray-700 hover:text-gray-900 transition">STORE</a></li>
-          <li><a href="/blog" class="nav-link text-sm font-normal text-gray-700 hover:text-gray-900 transition">NEWS/BLOG</a></li>
-          <li><a href="/contact" class="nav-link text-sm font-normal text-gray-700 hover:text-gray-900 transition">CONTACT</a></li>
+          <li><a href="/store" class="nav-link text-sm font-normal text-gray-700 hover:text-gray-900 transition font-mono">STORE</a></li>
+          <li><a href="/blog" class="nav-link text-sm font-normal text-gray-700 hover:text-gray-900 transition font-mono">NEWS/BLOG</a></li>
+          <li><a href="/contact" class="nav-link text-sm font-normal text-gray-700 hover:text-gray-900 transition font-mono">CONTACT</a></li>
         </ul>
 
-        <!-- モバイルメニューボタン（右寄せ） -->
-        <button
-          id="mobile-menu-button"
-          class="md:hidden p-3 text-gray-700 hover:text-gray-900 focus:outline-none ml-auto"
-          aria-label="menu"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </button>
+        <!-- 右端: Gumroadアイコンとモバイルメニューボタン -->
+        <div class="ml-auto flex items-center gap-2">
+          <!-- Gumroadライブラリリンク -->
+          <a
+            href="https://gumroad.com/library"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="p-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors rounded-lg"
+            aria-label="Gumroad Library"
+            title="Gumroad Library"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="w-5 h-5">
+              <g fill="none">
+                <path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z" />
+                <path fill="currentColor" d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2m0 2a8 8 0 1 0 0 16a8 8 0 0 0 0-16m0 2.5c.921 0 1.785.262 2.524.717c.415.255.944.654 1.347 1.16a1 1 0 0 1-1.48 1.34l-.085-.094c-.21-.264-.533-.52-.83-.702A2.8 2.8 0 0 0 12 8.5c-.877 0-1.612.295-2.124.803C9.37 9.807 9 10.6 9 11.75c0 1.001.276 1.833.71 2.39c.417.536 1.005.86 1.79.86c.48 0 1.099-.35 1.66-1.059a4.5 4.5 0 0 0 .576-.941H13a1 1 0 1 1 0-2h2a2 2 0 0 1 2 2v2.5a1 1 0 1 1-2 0v-.686a7 7 0 0 1-.272.37C14.002 16.1 12.87 17 11.5 17c-1.424 0-2.586-.627-3.367-1.63C7.369 14.389 7 13.096 7 11.75c0-1.6.526-2.932 1.467-3.866C9.403 6.955 10.668 6.5 12 6.5" />
+              </g>
+            </svg>
+          </a>
+
+          <!-- モバイルメニューボタン -->
+          <button
+            id="mobile-menu-button"
+            class="md:hidden p-3 text-gray-700 hover:text-gray-900 focus:outline-none"
+            aria-label="menu"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </nav>
@@ -36,18 +58,23 @@
   <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg">
     <ul class="py-4">
       <li>
-        <a href="/store" class="block px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition">
+        <a href="/store" class="block px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition font-mono">
           STORE
         </a>
       </li>
       <li>
-        <a href="/blog" class="block px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition">
+        <a href="/blog" class="block px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition font-mono">
           NEWS/BLOG
         </a>
       </li>
       <li>
-        <a href="/contact" class="block px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition">
+        <a href="/contact" class="block px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition font-mono">
           CONTACT
+        </a>
+      </li>
+      <li>
+        <a href="https://gumroad.com/library" target="_blank" rel="noopener noreferrer" class="block px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition font-mono">
+          GUMROAD LIBRARY
         </a>
       </li>
     </ul>

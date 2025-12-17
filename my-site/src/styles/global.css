@@ -1,5 +1,9 @@
 /* Tailwind v4 */
 @import "tailwindcss";
+@theme {
+  --font-sans: 'Hanken Grotesk Variable', sans-serif;
+  --font-mono: 'UnifontEX', monospace;
+}
 
 /* -----------------------------------
 Base enhancements (崩れ防止・可読性向上)

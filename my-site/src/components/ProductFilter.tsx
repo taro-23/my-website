@@ -1,6 +1,11 @@
-// src/components/ProductFilter.tsx
 import { useMemo, useState } from 'react';
-import type { Product } from '../data/productsdata';
+
+interface Product {
+  type: 'Patch Pack' | 'Sample Pack' | 'Wavetable';
+  platform: string[];
+  paid: boolean;
+  bundle: boolean;
+}
 
 interface FilterState {
   paid: boolean | null;
@@ -20,6 +25,17 @@ const typeOptions: Product['type'][] = [
   'Sample Pack',
   'Wavetable',
 ];
+
+// カスタムチェックボックスコンポーネント
+function CustomCheckbox({ checked }: { checked: boolean }) {
+  return (
+    <div className="w-4 h-4 flex items-center justify-center">
+      {checked && (
+        <span className="text-base leading-none">✔</span>
+      )}
+    </div>
+  );
+}
 
 export default function ProductFilter({ filters, setFilters, allProducts }: Props) {
   const [openBundle, setOpenBundle] = useState(false);
@@ -84,24 +100,32 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
       <div className="border-t pt-3">
         <h3 className="font-semibold mb-1 text-gray-900 text-[12px] uppercase tracking-wide">Type</h3>
         <div className="space-y-1">
-          <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
+          <label className="flex items-center gap-2 cursor-pointer px-1.5 py-1 rounded transition group relative">
             <input
-              type="radio"
+              type="checkbox"
               checked={filters.type === null}
               onChange={() => handleTypeChange(null)}
-              className="w-3 h-3 text-blue-600"
+              className="hidden"
             />
-            <span className="font-medium text-xs">All</span>
+            <CustomCheckbox checked={filters.type === null} />
+            <span className="font-medium text-xs relative">
+              All
+              <span className="absolute top-1/2 left-0 right-0 h-px bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+            </span>
           </label>
           {typeOptions.map((type) => (
-            <label key={type} className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-1.5 py-1 rounded transition">
+            <label key={type} className="flex items-center gap-2 cursor-pointer px-1.5 py-1 rounded transition group relative">
               <input
-                type="radio"
+                type="checkbox"
                 checked={filters.type === type}
                 onChange={() => handleTypeChange(type)}
-                className="w-3 h-3 text-blue-600"
+                className="hidden"
               />
-              <span className="font-medium text-xs">{type}</span>
+              <CustomCheckbox checked={filters.type === type} />
+              <span className="font-medium text-xs relative">
+                {type}
+                <span className="absolute top-1/2 left-0 right-0 h-px bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+              </span>
             </label>
           ))}
         </div>
@@ -130,15 +154,19 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
               return (
                 <label 
                   key={plat} 
-                  className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition"
+                  className="flex items-center gap-2 cursor-pointer px-1.5 py-1 rounded transition group relative"
                 >
                   <input
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => togglePlatform(plat)}
-                    className="w-3 h-3 text-blue-600"
+                    className="hidden"
                   />
-                  <span className="font-medium text-xs leading-tight">{plat}</span>
+                  <CustomCheckbox checked={isChecked} />
+                  <span className="font-medium text-xs leading-tight relative">
+                    {plat}
+                    <span className="absolute top-1/2 left-0 right-0 h-px bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                  </span>
                 </label>
               );
             })}
@@ -146,7 +174,7 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
         )}
       </div>
 
-      {/* Bundle (セクション全体クリック可能) */}
+      {/* Bundle */}
       <div className="border-t pt-3">
         <button
           onClick={() => setOpenBundle(prev => !prev)}
@@ -162,38 +190,50 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
 
         <div id="bundle-panel" className={openBundle ? 'mt-2 space-y-1' : 'hidden'}>
           <div className="space-y-1">
-            <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
+            <label className="flex items-center gap-2 cursor-pointer px-1.5 py-1 rounded transition group relative">
               <input
-                type="radio"
+                type="checkbox"
                 checked={filters.bundle === null}
                 onChange={() => setFilters({ ...filters, bundle: null })}
-                className="w-3 h-3 text-blue-600"
+                className="hidden"
               />
-              <span className="text-xs">All</span>
+              <CustomCheckbox checked={filters.bundle === null} />
+              <span className="text-xs relative">
+                All
+                <span className="absolute top-1/2 left-0 right-0 h-px bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+              </span>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
+            <label className="flex items-center gap-2 cursor-pointer px-1.5 py-1 rounded transition group relative">
               <input
-                type="radio"
+                type="checkbox"
                 checked={filters.bundle === true}
                 onChange={() => setFilters({ ...filters, bundle: true })}
-                className="w-3 h-3 text-blue-600"
+                className="hidden"
               />
-              <span className="font-medium text-xs">Bundle</span>
+              <CustomCheckbox checked={filters.bundle === true} />
+              <span className="font-medium text-xs relative">
+                Bundle
+                <span className="absolute top-1/2 left-0 right-0 h-px bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+              </span>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
+            <label className="flex items-center gap-2 cursor-pointer px-1.5 py-1 rounded transition group relative">
               <input
-                type="radio"
+                type="checkbox"
                 checked={filters.bundle === false}
                 onChange={() => setFilters({ ...filters, bundle: false })}
-                className="w-3 h-3 text-blue-600"
+                className="hidden"
               />
-              <span className="font-medium text-xs">Single</span>
+              <CustomCheckbox checked={filters.bundle === false} />
+              <span className="font-medium text-xs relative">
+                Single
+                <span className="absolute top-1/2 left-0 right-0 h-px bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+              </span>
             </label>
           </div>
         </div>
       </div>
 
-      {/* Price (セクション全体クリック可能) */}
+      {/* Price */}
       <div className="border-t pt-3">
         <button
           onClick={() => setOpenPrice(prev => !prev)}
@@ -209,32 +249,44 @@ export default function ProductFilter({ filters, setFilters, allProducts }: Prop
 
         <div id="price-panel" className={openPrice ? 'mt-2 space-y-1' : 'hidden'}>
           <div className="space-y-1">
-            <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
+            <label className="flex items-center gap-2 cursor-pointer px-1.5 py-1 rounded transition group relative">
               <input
-                type="radio"
+                type="checkbox"
                 checked={filters.paid === null}
                 onChange={() => setFilters({ ...filters, paid: null })}
-                className="w-3 h-3 text-blue-600"
+                className="hidden"
               />
-              <span className="font-medium text-xs">All</span>
+              <CustomCheckbox checked={filters.paid === null} />
+              <span className="font-medium text-xs relative">
+                All
+                <span className="absolute top-1/2 left-0 right-0 h-px bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+              </span>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
+            <label className="flex items-center gap-2 cursor-pointer px-1.5 py-1 rounded transition group relative">
               <input
-                type="radio"
+                type="checkbox"
                 checked={filters.paid === true}
                 onChange={() => setFilters({ ...filters, paid: true })}
-                className="w-3 h-3 text-blue-600"
+                className="hidden"
               />
-              <span className="font-medium text-xs">Paid</span>
+              <CustomCheckbox checked={filters.paid === true} />
+              <span className="font-medium text-xs relative">
+                Paid
+                <span className="absolute top-1/2 left-0 right-0 h-px bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+              </span>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-1.5 py-1 rounded transition">
+            <label className="flex items-center gap-2 cursor-pointer px-1.5 py-1 rounded transition group relative">
               <input
-                type="radio"
+                type="checkbox"
                 checked={filters.paid === false}
                 onChange={() => setFilters({ ...filters, paid: false })}
-                className="w-3 h-3 text-blue-600"
+                className="hidden"
               />
-              <span className="font-medium text-xs">Free</span>
+              <CustomCheckbox checked={filters.paid === false} />
+              <span className="font-medium text-xs relative">
+                Free
+                <span className="absolute top-1/2 left-0 right-0 h-px bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+              </span>
             </label>
           </div>
         </div>
