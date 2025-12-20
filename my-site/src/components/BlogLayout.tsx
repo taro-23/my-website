@@ -138,7 +138,7 @@ export default function BlogLayout({ posts, imageMap }: Props) {
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 text-sm font-mono">
                     <button
                       onClick={() => setSortBy('new')}
                       className={`sort-link text-xs font-medium transition relative ${

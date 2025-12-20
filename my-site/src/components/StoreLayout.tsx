@@ -245,36 +245,36 @@ export default function StoreLayout({ products, imageMap }: Props) {
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 text-sm font-mono">
                     <button
                       onClick={() => handleSortChange('new')}
-                      className={`sort-link text-xs font-medium transition relative ${
+                      className={`sort-link  transition relative ${
                         sortBy === 'new'
                           ? 'text-gray-900'
                           : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      New
+                      NEW
                     </button>
                     <button
                       onClick={() => handleSortChange('price-low')}
-                      className={`sort-link text-xs font-medium transition relative ${
+                      className={`sort-link  transition relative ${
                         sortBy === 'price-low'
                           ? 'text-gray-900'
                           : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      Low
+                      LOW
                     </button>
                     <button
                       onClick={() => handleSortChange('price-high')}
-                      className={`sort-link text-xs font-medium transition relative ${
+                      className={`sort-link  transition relative ${
                         sortBy === 'price-high'
                           ? 'text-gray-900'
                           : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      High
+                      HIGH
                     </button>
                   </div>
 
