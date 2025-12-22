@@ -55,6 +55,29 @@ const productImageUrl = imageModule
   : `https://placehold.co/1200x630/111827/ffffff?text=${encodeURIComponent(product.data.name)}`;
 
 const productTypeEncoded = encodeURIComponent(product.data.type);
+// 構造化データ用のProduct Schema
+const productSchema = {
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": product.data.name,
+  "image": productImageUrl,
+  "description": seoDescription,
+  "brand": {
+    "@type": "Brand",
+    "name": "kimura taro"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": new URL(Astro.url.pathname, Astro.site).href,
+    "priceCurrency": "USD",
+    "price": product.data.paid ? product.data.price.toString() : "0",
+    "availability": "https://schema.org/InStock",
+    "seller": {
+      "@type": "Organization",
+      "name": "kimura taro"
+    }
+  }
+};
 
 const allProducts = await getCollection('products');
 const relatedProducts = allProducts
@@ -79,6 +102,10 @@ for (const rp of relatedProducts) {
   type="product"
   image={productImageUrl}
   isStorePage={true}
+
+  <Fragment slot="head">
+  <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+  </Fragment>
 >
   <div class="bg-white min-h-screen pt-16">
     <div class="flex">

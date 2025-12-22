@@ -108,6 +108,7 @@ const socialImage = new URL(image, Astro.site);
       gtag("js", new Date());
       gtag('config', 'G-G3J4447L1T');
     </script>
+    <slot name="head" />
   </head>
   <body class="min-h-screen flex flex-col bg-white">
     <Header />
