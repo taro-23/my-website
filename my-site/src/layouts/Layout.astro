@@ -94,7 +94,7 @@ const socialImage = new URL(image, Astro.site);
         }
       })
     })} />
-    
+
     <!-- Google tag (gtag.js) -->
     <script
       type="text/partytown"
@@ -108,6 +108,8 @@ const socialImage = new URL(image, Astro.site);
       gtag("js", new Date());
       gtag('config', 'G-G3J4447L1T');
     </script>
+
+    <!-- Additional head content -->
     <slot name="head" />
   </head>
   <body class="min-h-screen flex flex-col bg-white">
