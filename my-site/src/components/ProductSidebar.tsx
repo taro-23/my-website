@@ -16,7 +16,7 @@ export default function ProductSidebar({ currentType, currentPlatforms = [] }: P
       {/* All Products */}
       <div>
         <a
-          href="/store"
+          href="/products"
           className="block w-full text-left px-1.5 py-1 rounded hover:bg-gray-100 transition text-xs font-semibold"
         >
           ALL PRODUCTS
@@ -36,7 +36,7 @@ export default function ProductSidebar({ currentType, currentPlatforms = [] }: P
             return (
               <a
                 key={type}
-                href={`/store?type=${typeParam}`}
+                href={`/products?type=${typeParam}`}
                 className={`block px-1.5 py-1 rounded transition text-xs font-medium group ${
                   isActive ? '' : 'hover:bg-gray-50'
                 }`}
