@@ -47,8 +47,8 @@ const { Content } = await product.render();
 
 const seoTitle = `${product.data.name} - kimura taro`;
 const seoDescription = product.data.type === 'Sample Pack' 
-  ? `${product.data.name} - High-quality ${product.data.type.toLowerCase()} for ${product.data.platform.join(', ')}. ${product.data.paid ? `${product.data.price}` : 'Free download'}.`
-  : `${product.data.name} - Professional ${product.data.type.toLowerCase()} for ${product.data.platform.join(', ')}. ${product.data.paid ? `${product.data.price}` : 'Free download'}.`;
+  ? `${product.data.name} -  ${product.data.type.toLowerCase()} for ${product.data.platform.join(', ')}. ${product.data.paid ? `${product.data.price}` : 'Free download'}.`
+  : `${product.data.name} -  ${product.data.type.toLowerCase()} for ${product.data.platform.join(', ')}. ${product.data.paid ? `${product.data.price}` : 'Free download'}.`;
 
 const productImageUrl = imageModule 
   ? new URL(`/assets/img/${product.data.image}`, Astro.site).href
